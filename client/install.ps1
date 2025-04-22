@@ -17,7 +17,7 @@ $sshconfig = "$sshdir\config"
 $configblock = @"
 Host vscode-remote-hpc
     User $uname
-    ProxyCommand ssh $headnode ""/usr/local/bin/vscode-remote.sh connect""
+    ProxyCommand ssh $headnode ""/usr/local/bin/vscode-remote connect""
     StrictHostKeyChecking no
 "@
 
