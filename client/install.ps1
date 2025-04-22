@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 #
 # Windows PowerShell client installation script
 #
