@@ -1,97 +1,95 @@
-# vscode-remote-hpc
+<!--
+Copyright (c) 2025 Ernst Strüngmann Institute (ESI) for Neuroscience
+in Cooperation with Max Planck Society
+SPDX-License-Identifier: CC-BY-NC-SA-1.0
+-->
 
-A one-click script to setup and connect vscode to a Slurm-based HPC compute node, directly from the VS Code remote explorer. 
+# VS Code Remote HPC
+
+Scripts for connecting [VS Code](https://code.visualstudio.com/download) to a 
+non-interactive HPC compute node managed by the [SLURM](https://slurm.schedmd.com/overview.html)
+workload manager. 
+
+This repo has been forked from [vscode-remote-hpc](https://github.com/gmertes/vscode-remote-hpc)
+and (in parts) heavily modified: the server-side installation requires administrative 
+access to the cluster head node(s), the client side installation supports macOS, 
+Linux and Windows (PowerShell) and does not need special privileges. 
 
 ## Features
-This script is designed to be used with the [Remote - SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) extension for Visual Studio Code. 
 
-- Automatically starts a batch job, or reuses an existing one, for vscode to connect to.
-- No need to manually execute the script on the HPC, just connect from the remote explorer and the script handles everything automagically through `ProxyCommand`.
-- Support for two different job types: CPU and GPU
+This script is designed to be used with the [Remote- SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) 
+extension for Visual Studio Code. 
 
-## Requirements
-- `sshd` must be available on the compute node, installed in `/usr/sbin` or available in the PATH
-- A typical `sshd` installation is required, it must read login keys from `~/.ssh/authorized_keys` 
-- You must be allowed to run `sshd` in a batch job on an arbitrary port above 10000, and connect to it from the login node
-- The `nc` command (netcat) must be available on the HPC login node
-- Compute node names must resolve to their internal IP addresses
-- Compute nodes must be accessible via IP from the login node
-- You must have SSH access to the HPC login node
+- Automatically starts a batch job, or reuses an existing one, for VS Code to connect to.
+- No need to manually execute the script on the HPC, just connect from the remote 
+  explorer and the script handles everything automagically using an ssh `ProxyCommand`.
 
-These requirements are usually met, except if explicitly changed or forbidden by your system admin.
+## Installation 
 
-## Setup
+### Windows 10 and 11 (PowerShell) 
 
-Git clone the repo on the HPC login node (replace `HPC-LOGIN` with your own) and run the installer. 
+Open PowerShell and run the following command 
 
-```shell
-ssh HPC-LOGIN
-git clone git@github.com:gmertes/vscode-remote-hpc.git
-cd vscode-remote-hpc
-bash install.sh
+``` PowerShell
+irm https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/heads/main/client/install.ps1 | iex
 ```
 
-The script will be installed in `~/bin` and added to your PATH. 
+### Linux, macOS and Windows Subsystem for Linux (WSL)
 
-Open the installed script `~/bin/vscode-remote` with your favourite editor and edit the `SBATCH_PARAM_CPU` and `SBATCH_PARAM_GPU` parameters at the top according to your Slurm system. It is recommended to keep the job time (`-t`) to a reasonable amount. The script expects that jobs get automatically killed when they reach their wall clock time. 
+Open a terminal (`Terminal.App` in macOS) and run the following command:
 
-On your local machine, generate a new ssh key for vscode-remote:
-
-```shell
-ssh-keygen -f ~/.ssh/vscode-remote -t ed25519 -N ""
+```zsh
+curl -fsSL https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/heads/main/client/install.sh | bash
 ```
-
-Copy the public key to your HPC `authorized_hosts`, you can use `ssh-copy-id`:
-
-```shell
-ssh-copy-id -i ~/.ssh/vscode-remote HPC-LOGIN
-```
-
-In VS Code, change the `remote.SSH.connectTimeout` setting. Set this to the maximum time in seconds you expect a new job to start on your HPC. The script default is `300`.
-
-```yaml
-"remote.SSH.connectTimeout": 300
-```
-
-Add the following entry to your local machine's `~/.ssh/config`. Change `USERNAME` and `HPC-LOGIN` accordingly:
-
-```bash
-Host vscode-remote-cpu
-    User USERNAME
-    IdentityFile ~/.ssh/vscode-remote
-    ProxyCommand ssh HPC-LOGIN "~/bin/vscode-remote cpu"
-    StrictHostKeyChecking no
-```
-
-You can change `vscode-remote cpu` to `vscode-remote gpu` to start a GPU job.
 
 ## Usage
-The `vscode-remote-cpu` host is now available in the VS Code remote explorer. Connecting to this host will automatically launch a batch job on a CPU node, wait for it to start, and connect to the node when the job is running.
 
-Running jobs are automatically reused. If a running job is already found, it will simply connect to it. You can safely open many remote windows and they will all share the same running job. 
+The `vscode-remote-hpc` host is now available in the VS Code Remote Explorer. 
+Connecting to this host will automatically launch a sbatch job on a HPC compute node, 
+wait for it to start, and connect to the node as soon as the job is running.
+Thus, controlling VS Code remote HPC sessions can be done exclusively from 
+within VS Code itself. 
 
-Note that disconnecting the remote session in vscode will **not** kill the job on the HPC. You can close the remote window and the job will keep running. Jobs are expected to be automatically killed by the Slurm scheduler when they reach their wall clock time. You can manually kill the job using `scancel` or with the `vscode-remote cancel` command (see [CLI](#CLI)).
+Running jobs are automatically reused. If a running job is found, the script simply 
+connects to it. You can safely open many remote windows and they will all share 
+the same SLURM job. 
 
-You can have one CPU and one GPU job running at the same time, just add a new entry in your `~/.ssh/config` for the GPU job:
+Note that disconnecting the remote session in VS Code will **not** kill the 
+corresponding SLURM job. If you close the remote window the SLURM job keeps running. 
+Jobs are automatically killed by the SLURM controller when they reach their 
+runtime limit. You can manually kill the job by logging on to the cluster head node 
+and running the command 
 
-```bash
-Host vscode-remote-gpu
-    User USERNAME
-    IdentityFile ~/.ssh/vscode-remote
-    ProxyCommand ssh HPC-LOGIN "~/bin/vscode-remote gpu"
-    StrictHostKeyChecking no
+``` bash
+vscode-remote cancel
 ```
 
-## CLI
-The `vscode-remote` command installed on your HPC offers some commands to list or cancel running jobs. Do `vscode-remote help` for help on its usage.
+or manually by using `squeue --me` to find the right SLURM job id followed by 
+`scancel <jobid>`. 
 
-```bash
-$ vscode-remote help
-Usage :  ~/bin/vscode-remote [command]
+The `vscode-remote` command installed on your HPC offers some additional commands 
+to list or cancel running jobs. You can invoke `vscode-remote help` for more information. 
 
-    General commands:
-    list      List running vscode-remote jobs
-    cancel    Cancels running vscode-remote jobs
-    ssh       SSH into the node of a running job
-    help      Display this message
+## HPC Admin Setup
+
+The following applications must be executable for non-privileged users on on all 
+compute nodes:
+
+- `sshd` installed in `/usr/sbin` or available in the `$PATH`
+- `nc` (netcat) must be available on the login node(s)
+- compute node names must resolve to their internal IP addresses
+- compute nodes must be accessible via IP from the login node
+
+The client-side setup expects `vscode-remote` as well as `vscode-remote-job.sh`
+to reside in `/usr/local/bin`. The recommended manner to set it up that way is 
+to clone this repository and use symlinks (so that future updates can be deployed
+using a simple `git pull`):
+
+``` bash
+cd /path/to/cluter-fs/
+git clone https://github.com/pantaray/vscode-remote-hpc.git
+ln -s /path/to/cluter-fs/vscode-remote-hpc/server/vscode-remote.sh /usr/local/bin/vscode-remote
+ln -s /path/to/cluter-fs/vscode-remote-hpc/server/vscode-remote-job.sh /usr/local/bin/vscode-remote-job.sh
 ```
+
+Ensure that both scripts can be executed by non-privileged users. 
