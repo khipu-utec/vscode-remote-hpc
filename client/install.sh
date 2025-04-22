@@ -15,10 +15,9 @@ read -p "Please enter the IP address or hostname of the cluster head node (hub a
 
 sshdir="${HOME}/.ssh"
 sshconfig="${sshdir}/config"
-configblock="Host vscode-remote-cpu
+configblock="Host vscode-remote-hpc
     User ${uname}
-    IdentityFile ~/.ssh/vscode-remote
-    ProxyCommand ssh ${headnode} \"~/bin/vscode-remote\"
+    ProxyCommand ssh ${headnode} \"/usr/local/bin/vscode-remote.sh connect\"
     StrictHostKeyChecking no
 "
 
@@ -35,12 +34,12 @@ if [ ! -f "${sshconfig}" ]; then
 fi
 
 # Check for existing Host block
-if ! grep -qE '^[Hh]ost[[:space:]]+vscode-remote\b' "${sshconfig}"; then
+if ! grep -qE '^[Hh]ost[[:space:]]+vscode-remote-hpc\b' "${sshconfig}"; then
     echo "" >> "${sshconfig}"
     echo "${configblock}" >> "${sshconfig}"
     echo "Updated ssh configuration"
 else
-    echo "VS Code remote configuration already exists. No changes made."
+    echo "VS Code remote HPC configuration already exists. No changes made."
 fi
 
 echo "-- All Done ---"

@@ -14,12 +14,10 @@ $headnode = Read-Host "Please enter the IP address or hostname of the cluster he
 
 $sshdir = "$HOME\.ssh"
 $sshconfig = "$sshdir\config"
-$configblockstart = "Host vscode-remote-cpu"
 $configblock = @"
-Host vscode-remote
+Host vscode-remote-hpc
     User $uname
-    IdentityFile ~/.ssh/vscode-remote
-    ProxyCommand ssh $headnode ""~/bin/vscode-remote""
+    ProxyCommand ssh $headnode ""/usr/local/bin/vscode-remote.sh connect""
     StrictHostKeyChecking no
 "@
 
@@ -35,11 +33,11 @@ if (-not (Test-Path -Path $sshconfig)) {
 
 # Check for existing Host block
 $configText = Get-Content $sshconfig -Raw
-if ($configText -notmatch "(?ms)^Host\s+vscode-remote\b") {
+if ($configText -notmatch "(?ms)^Host\s+vscode-remote-hpc\b") {
     Add-Content -Path $sshconfig -Value "`n$configblock"
     Write-Output "Updated ssh configuration"
 } else {
-    Write-Output "VS Code remote configuration already exists. No changes made."
+    Write-Output "VS Code remote HPC configuration already exists. No changes made."
 }
 
 Write-Output "-- All Done ---"
