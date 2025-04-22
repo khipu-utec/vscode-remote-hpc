@@ -10,8 +10,8 @@
 
 echo "--- This script sets up VS Code remote connections to the HPC cluster ---"
 
-read -p "Please enter your HPC username: " uname
-read -p "Please enter the IP address or hostname of the cluster head node (hub at ESI, or 192.168.161.221 at CoBIC): " headnode
+read -p "Please enter your HPC username: " uname </dev/tty
+read -p "Please enter the IP address or hostname of the cluster head node (hub at ESI, or 192.168.161.221 at CoBIC): " headnode </dev/tty
 
 sshdir="${HOME}/.ssh"
 sshconfig="${sshdir}/config"
