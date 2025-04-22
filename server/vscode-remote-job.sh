@@ -1,6 +1,12 @@
 #!/bin/bash
-
-#SBATCH -t 12:00:00
+#
+# Stub for launching sshd via sbatch
+#
+# Copyright © 2025 Ernst Strüngmann Institute (ESI) for Neuroscience
+# in Cooperation with Max Planck Society
+#
+# SPDX-License-Identifier: MIT
+#
 #SBATCH -o none
 
 if [ ! -d "${HOME:-~}.ssh" ]; then

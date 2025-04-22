@@ -1,21 +1,26 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# Script for connecting to SLURMed VS Code Remote sessions
+#
+# Copyright © 2025 Ernst Strüngmann Institute (ESI) for Neuroscience
+# in Cooperation with Max Planck Society
+#
+# SPDX-License-Identifier: MIT
+#
 
-# Set your Slurm parameters for GPU and CPU jobs here
-SBATCH_PARAM_CPU="-q ni -t 12:00:00 --mem=32G -c 8"
-SBATCH_PARAM_GPU="-q ng --gpus=1 -t 04:00:00 --mem=32G -c 8"
-
-# The time you expect a job to start in (seconds)
-# If a job doesn't start within this time, the script will exit and cancel the pending job
 TIMEOUT=300
-
-
-####################
-# don't edit below this line
-####################
+if [[ "${HOSTNAME}" == "esi-sv"* ]]; then
+    SBATCH_PARAM="-p 8GBL -c 1 --mem-per-cpu 7500MB"
+elif [[ "${HOSTNAME}" == "bic-sv"* ]]; then
+    SBATCH_PARAM="-p 8GBSx86 -c 1 --mem-per-cpu 7500MB"
+else
+    echo "WARNING: Unknown HPC environment ${HOSTNAME} - falling back to SLURM defaults"
+    SBATCH_PARAM="-q ni -t 12:00:00 --mem=32G -c 8"
+fi
 
 function usage ()
 {
-    echo "Usage :  $0 [command]
+    echo "Usage : $0 [command]
 
     General commands:
     list      List running vscode-remote jobs
@@ -23,19 +28,17 @@ function usage ()
     ssh       SSH into the node of a running job
     help      Display this message
 
-    Job commands (see usage below):
-    cpu       Connect to a CPU node
-    gpu       Connect to a GPU node
+    Job command (see usage below):
+    connect   Connect to compute node
 
-    You should _NOT_ manually call the script with 'cpu' or 'gpu' commands.
+    You should _NOT_ manually call the script with 'connect'.
     They should be used in the ProxyCommand in your ~/.ssh/config file, for example:
-        Host vscode-remote-cpu
-            User USERNAME
+        Host vscode-remote
+            User <username>
             IdentityFile ~/.ssh/vscode-remote
-            ProxyCommand ssh HPC-LOGIN \"~/bin/vscode-remote cpu\"
+            ProxyCommand ssh <headnode> \"~/bin/vscode-remote connect\"
             StrictHostKeyChecking no  
 
-    You can have a CPU and GPU job running at the same time, just add them as separate hosts in your config.
     "
 } 
 
@@ -107,7 +110,7 @@ function connect () {
     query_slurm
 
     if [ -z "${JOB_STATE}" ]; then
-        PORT=$(shuf -i 10000-65000 -n 1)
+        PORT=$(shuf -i 60001-63000 -n 1)
         list=($(/usr/bin/sbatch -J $JOB_NAME%$PORT $SBATCH_PARAM $SCRIPT_DIR/vscode-remote-job.sh $PORT))
         JOB_SUBMIT_ID=${list[3]}
         >&2 echo "Submitted new $JOB_NAME job (id: $JOB_SUBMIT_ID)"
@@ -135,12 +138,11 @@ if [ ! -z "$1" ]; then
     START=$(date +%s)
     trap "cleanup && exit 1" INT TERM
     case $1 in
-        list)   list ;;
-        cancel) cancel ;;
-        ssh)    ssh_connect ;;
-        cpu)    JOB_NAME=$JOB_NAME-cpu; SBATCH_PARAM=$SBATCH_PARAM_CPU; connect ;;
-        gpu)    JOB_NAME=$JOB_NAME-gpu; SBATCH_PARAM=$SBATCH_PARAM_GPU; connect ;;
-        help)   usage ;;
+        list)    list ;;
+        cancel)  cancel ;;
+        ssh)     ssh_connect ;;
+        connect) connect ;;
+        help)    usage ;;
         *)  echo -e "Command '$1' does not exist" >&2
             usage; exit 1 ;;
     esac  
