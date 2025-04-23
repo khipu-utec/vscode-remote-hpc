@@ -25,7 +25,6 @@ function usage ()
     General commands:
     list      List running vscode-remote jobs
     cancel    Cancels running vscode-remote jobs
-    ssh       SSH into the node of a running job
     help      Display this message
 
     Job command (see usage below):
@@ -96,16 +95,6 @@ function list () {
     echo "$(squeue --me -O JobId,Partition,Name:$width,State,TimeUsed,TimeLimit,NodeList | grep -E "JOBID|$JOB_NAME")"
 }
 
-function ssh_connect () {
-    query_slurm
-    if [ -z "${JOB_NODE}" ]; then
-        echo "No running job found"
-        exit 1
-    fi
-    echo "Connecting to $JOB_NODE via SSH"
-    ssh $JOB_NODE
-}
-
 function connect () {
     query_slurm
 
@@ -140,7 +129,6 @@ if [ ! -z "$1" ]; then
     case $1 in
         list)    list ;;
         cancel)  cancel ;;
-        ssh)     ssh_connect ;;
         connect) connect ;;
         help)    usage ;;
         *)  echo -e "Command '$1' does not exist" >&2
