@@ -14,9 +14,11 @@ $headnode = Read-Host "Please enter the IP address or hostname of the cluster he
 
 $sshdir = "$HOME\.ssh"
 $sshconfig = "$sshdir\config"
+$sshkey = "$sshdir\vscode-remote-hpc"
 $configblock = @"
 Host vscode-remote-hpc
     User $uname
+    IdentityFile $sshkey
     ProxyCommand ssh $headnode ""/usr/local/bin/vscode-remote connect""
     StrictHostKeyChecking no
 "@
@@ -33,11 +35,18 @@ if (-not (Test-Path -Path $sshconfig)) {
 
 # Check for existing Host block
 $configText = Get-Content $sshconfig -Raw
-if ($configText -notmatch "(?ms)^Host\s+vscode-remote-hpc\b") {
+if ($configContent -notmatch "Host vscode-remote-hpc\s") {
     Add-Content -Path $sshconfig -Value "`n$configblock"
     Write-Output "Updated ssh configuration"
 } else {
     Write-Output "VS Code remote HPC configuration already exists. No changes made."
+}
+
+# If it does not exist already, create a new ssh key for vscode-remote-hpc
+if (-not (Test-Path -Path $sshkey)) {
+   $ans = Read-Host "About to create and upload an ssh key to $headnode. You will be prompted for your cluster password. Press any key to continue "
+   ssh-keygen -f $sshkey -t ed25519 -N ""
+   ssh-copy-id -i $sshkey $headnode
 }
 
 Write-Output "-- All Done ---"
