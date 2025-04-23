@@ -18,6 +18,7 @@ sshconfig="${sshdir}/config"
 sshkey="${sshdir}/vscode-remote-hpc"
 configblock="Host vscode-remote-hpc
     User ${uname}
+    IdentityFile ${sshkey}
     ProxyCommand ssh ${headnode} \"/usr/local/bin/vscode-remote connect\"
     StrictHostKeyChecking no
 "
@@ -44,7 +45,7 @@ else
 fi
 
 # If it does not exist already, create a new ssh key for vscode-remote-hpc
-if [ ! -f "${sshconfig}" ]; then
+if [ ! -f "${sshkey}" ]; then
     read -p "About to create and upload an ssh key to ${headnode}. You will be prompted for your cluster password. Press any key to continue " ans </dev/tty
     ssh-keygen -f "${sshkey}" -t ed25519 -N ""
     ssh-copy-id -i "${sshkey}" "${headnode}"
