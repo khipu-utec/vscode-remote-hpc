@@ -34,8 +34,8 @@ if (-not (Test-Path -Path $sshconfig)) {
 }
 
 # Check for existing Host block
-$configText = Get-Content $sshconfig -Raw
-if ($configText -notmatch "Host vscode-remote-hpc\s") {
+$configText = Select-String -Path $sshconfig -Pattern "Host vscode-remote-hpc"
+if ($configText -eq $null){
     Add-Content -Path $sshconfig -Value "`n$configblock"
     Write-Output "Updated ssh configuration"
 } else {
