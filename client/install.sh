@@ -49,6 +49,8 @@ if [ ! -f "${sshkey}" ]; then
     read -p "About to create and upload an ssh key to ${headnode}. You will be prompted for your cluster password. Press any key to continue " ans </dev/tty
     ssh-keygen -q -f "${sshkey}" -t ed25519 -N ""
     ssh-copy-id -i "${sshkey}" "${headnode}"
+else
+    echo "VS Code remote ssh key already exists. No changes made."
 fi
 
 echo "-- All Done ---"
