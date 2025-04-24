@@ -43,7 +43,7 @@ function usage ()
 
 function query_slurm () {
     # only list states that can result in a running job
-    list=($(squeue --me --states=R,PD,S,CF,RF,RH,RQ -h -O JobId:" ",Name:" ",State:" ",NodeList:" " | grep $JOB_NAME))
+    list=($(/usr/bin/squeue --me --states=R,PD,S,CF,RF,RH,RQ -h -O JobId:" ",Name:" ",State:" ",NodeList:" " | grep $JOB_NAME))
 
     if [ ! ${#list[@]} -eq 0 ]; then
         JOB_ID=${list[0]}
@@ -92,7 +92,7 @@ function cancel () {
 
 function list () {
     width=$((${#JOB_NAME} + 11))
-    echo "$(squeue --me -O JobId,Partition,Name:$width,State,TimeUsed,TimeLimit,NodeList | grep -E "JOBID|$JOB_NAME")"
+    echo "$(/usr/bin/squeue --me -O JobId,Partition,Name:$width,State,TimeUsed,TimeLimit,NodeList | grep -E "JOBID|$JOB_NAME")"
 }
 
 function connect () {
