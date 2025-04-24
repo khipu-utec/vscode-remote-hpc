@@ -35,7 +35,7 @@ if (-not (Test-Path -Path $sshconfig)) {
 
 # Check for existing Host block
 $configText = Get-Content $sshconfig -Raw
-if ($configContent -notmatch "Host vscode-remote-hpc\s") {
+if ($configText -notmatch "Host vscode-remote-hpc\s") {
     Add-Content -Path $sshconfig -Value "`n$configblock"
     Write-Output "Updated ssh configuration"
 } else {
@@ -45,8 +45,8 @@ if ($configContent -notmatch "Host vscode-remote-hpc\s") {
 # If it does not exist already, create a new ssh key for vscode-remote-hpc
 if (-not (Test-Path -Path $sshkey)) {
    $ans = Read-Host "About to create and upload an ssh key to $headnode. You will be prompted for your cluster password. Press any key to continue "
-   ssh-keygen -q -f $sshkey -t ed25519 -N ""
-   type $sshkey.pub | ssh $headnode "cat >> ~/.ssh/authorized_keys"
+   ssh-keygen -q -f $sshkey -t ed25519 -N '""'
+   type "$sshkey.pub" | ssh $headnode "cat >> ~/.ssh/authorized_keys"
 }
 
 Write-Output "-- All Done ---"
