@@ -19,7 +19,7 @@ $configblock = @"
 Host vscode-remote-hpc
     User $uname
     IdentityFile $sshkey
-    ProxyCommand ssh $headnode ""/usr/local/bin/vscode-remote connect""
+    ProxyCommand ssh $uname@$headnode ""/usr/local/bin/vscode-remote connect""
     StrictHostKeyChecking no
 "@
 
