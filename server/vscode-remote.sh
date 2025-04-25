@@ -107,15 +107,27 @@ function connect () {
 
     while [ ! "$JOB_STATE" == "RUNNING" ]; do
         timeout
-        sleep 5
+        tstart=$SECONDS
+        elapsed=0
+        # Sleep 5 seconds (w/o spawning a subprocess)
+        while [ "${elapsed}" -lt 5 ]; do
+            elapsed=$((SECONDS - $tstart))
+            >&2 echo -n "Waiting ${elapsed} seconds..."
+            >&2 echo -e "\r\033[0K"
+        done
         query_slurm
     done
 
     >&2 echo "Connecting to $JOB_NODE"
 
-    while ! nc -z $JOB_NODE $JOB_PORT; do 
+    while ! nc -z $JOB_NODE $JOB_PORT; do
         timeout
-        sleep 1 
+        # Sleep 1 second (w/o spawning a subprocess)
+        while [ "${elapsed}" -lt 1 ]; do
+            elapsed=$((SECONDS - $tstart))
+            >&2 echo -n "Waiting ${elapsed} seconds..."
+            >&2 echo -e "\r\033[0K"
+        done
     done
 
     nc $JOB_NODE $JOB_PORT
