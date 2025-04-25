@@ -81,6 +81,10 @@ function timeout () {
 
 function cancel () {
     query_slurm > /dev/null 2>&1
+    if [ -z "${JOB_ID}" ]; then
+        echo "No running vscode-remote job found"
+        return 0;
+    fi
     while [ ! -z "${JOB_ID}" ]; do
         echo "Cancelling running job $JOB_ID on $JOB_NODE"
         scancel $JOB_ID
