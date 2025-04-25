@@ -8,14 +8,59 @@
 # SPDX-License-Identifier: MIT
 #
 
-echo "--- This script sets up VS Code remote connections to the HPC cluster ---"
-
-read -p "Please enter your HPC username: " uname </dev/tty
-read -p "Please enter the IP address or hostname of the cluster head node (hub at ESI, or 192.168.161.221 at CoBIC): " headnode </dev/tty
-
+# Default ssh config/key location
 sshdir="${HOME}/.ssh"
 sshconfig="${sshdir}/config"
 sshkey="${sshdir}/vscode-remote-hpc"
+
+echo "--- This script sets up VS Code remote connections to the HPC cluster ---"
+
+# Check if vscode-remote-hpc has already been setup
+if [[ -f "${sshconfig}" && -f "${sshkey}" ]]; then
+    echo "It seems vscode-remote-hpc is already installed. How do you want to proceed?"
+    echo "1. Abort"
+    echo "2. Uninstall"
+    read -p "Please choose an option (1 or 2): " choice </dev/tty
+    case "${choice}" in
+        1)
+            exit
+            ;;
+        2)
+            if [[ -f "${sshconfig}" ]]; then
+                sshconfigbak="${sshconfig}.bak"
+                cp -f "${sshconfig}" "${sshconfigbak}"
+                awk '
+                    BEGIN {skip=0}
+                    /^\s*Host\s+vscode-remote-hpc\s*$/ {skip=1; next}
+                    skip && /^[ \t]/ {next}
+                    skip && /^[[:space:]]*$/ {next}
+                    skip {skip=0}
+                    {print}
+                ' "${sshconfig}" > "${sshconfig}.tmp" && mv "${sshconfig}.tmp" "${sshconfig}"
+                echo "Block for vscode-remote-hpc has been removed from ${sshconfig} (if it was present)."
+            else
+                echo "${sshconfig} does not exist. Nothing to remove."
+            fi
+            echo "Removing generated ssh key-pair"
+            rm -f "${sshkey}"
+            rm -f "${sshkey}.pub"
+            echo "Done"
+            echo "All cleaned up, vscode-remote-hpc has been uninstalled. Bye. "
+            exit
+            ;;
+        *)
+            echo "Invalid choice. Aborting."
+            exit
+            ;;
+    esac
+fi
+
+# Query account/head node information
+read -p "Please enter your HPC username: " uname </dev/tty
+echo "Please enter the IP address or hostname of the cluster head node"
+read -p " (hub.esi.local at ESI, or 192.168.161.221 at CoBIC): " headnode </dev/tty
+
+# Put together configuration block for ssh config
 configblock="Host vscode-remote-hpc
     User ${uname}
     IdentityFile ${sshkey}
