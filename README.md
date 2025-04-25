@@ -31,7 +31,7 @@ extension for Visual Studio Code.
 Open PowerShell and run the following command 
 
 ``` PowerShell
-irm https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/heads/main/client/install.ps1 | iex
+irm https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/heads/main/client/setup.ps1 | iex
 ```
 
 ### Linux, macOS and Windows Subsystem for Linux (WSL)
@@ -39,7 +39,7 @@ irm https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/he
 Open a terminal (`Terminal.App` in macOS) and run the following command:
 
 ```zsh
-curl -fsSL https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/heads/main/client/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/heads/main/client/setup.sh | bash
 ```
 
 ## Usage
@@ -69,6 +69,25 @@ or manually by using `squeue --me` to find the right SLURM job id followed by
 
 The `vscode-remote` command installed on your HPC offers some additional commands 
 to list or cancel running jobs. You can invoke `vscode-remote help` for more information. 
+
+## Removal
+
+To remove `vscode-remote-hpc` either manually delete the "vscode-remote-hpc" 
+config block from your ssh configuration file and remove the generated ssh 
+key-pair (`vscode-remote-hpc` + `vscode-remote-hpc.pub`) or run the respective 
+setup command again:
+
+### Windows 10 and 11 (PowerShell) 
+
+``` PowerShell
+irm https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/heads/main/client/setup.ps1 | iex
+```
+
+### Linux, macOS and Windows Subsystem for Linux (WSL)
+
+```zsh
+curl -fsSL https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/heads/main/client/setup.sh | bash
+```
 
 ## HPC Admin Setup
 
