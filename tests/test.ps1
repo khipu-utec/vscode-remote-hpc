@@ -26,7 +26,7 @@ $expectedconfig = @"
 Host vscode-remote-hpc
     User $VSRtester
     IdentityFile $sshkey
-    ProxyCommand ssh $VSRtester@$VSRhead ""/usr/local/bin/vscode-remote cpu""
+    ProxyCommand ssh $VSRtester@$VSRhead ""/usr/local/bin/vscode-remote connect""
     StrictHostKeyChecking no
 "@.Trim()
 

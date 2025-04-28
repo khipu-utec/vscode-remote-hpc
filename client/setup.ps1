@@ -128,7 +128,9 @@ if (-not (Test-Path -Path $sshkey)) {
       $ans = Read-Host "About to create and upload an ssh key to $headnode. You will be prompted for your cluster password. Press any key to continue "
    }
    ssh-keygen -q -f $sshkey -t ed25519 -N '""'
-   type "$sshkey.pub" | ssh $uname@$headnode "cat >> ~/.ssh/authorized_keys"
+   if ($PSBoundParameters.Count -eq 0) {
+      type "$sshkey.pub" | ssh $uname@$headnode "cat >> ~/.ssh/authorized_keys"
+   }
 } else {
     Write-Output "VS Code remote ssh key already exists. No changes made."
 }
