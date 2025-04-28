@@ -12,11 +12,19 @@ $sshdir = "$HOME\.ssh"
 $sshconfig = "$sshdir\config"
 $sshkey = "$sshdir\vscode-remote-hpc"
 
+# Either query for HPC username and headnode or take CLI arguments
+param(
+    [Parameter(Position=0, Mandatory=$false)]
+    [string]$uname,
+    [Parameter(Position=1, Mandatory=$false)]
+    [string]$headnode
+)
+
 Write-Output "--- This script sets up VS Code remote connections to the HPC cluster ---"
 
 # Check if vscode-remote-hpc has already been setup
 if ((Test-Path $sshconfig) -and (Test-Path $sshkey)) {
-    if (-not $Env:VSRunattended) {
+    if ($PSBoundParameters.Count -eq 0) {
         Write-Output "It seems vscode-remote-hpc is already installed. How do you want to proceed?"
         Write-Output "1. Abort"
         Write-Output "2. Uninstall"
@@ -78,13 +86,12 @@ if ((Test-Path $sshconfig) -and (Test-Path $sshkey)) {
 }
 
 # Query account/head node information
-if (-not $Env:VSRunattended) {
+if (-not $uname) {
     $uname = Read-Host "Please enter your HPC uname: "
+}
+if (-not $headnode) {
     Write-Output "Please enter the IP address or hostname of the cluster head node"
     $headnode = Read-Host "(hub.esi.local at ESI, or 192.168.161.221 at CoBIC): "
-} else {
-    $uname = "VSRtester"
-    $headnode = "VSRheadnode"
 }
 
 # Put together configuration block for ssh config
