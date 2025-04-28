@@ -210,7 +210,7 @@ if ((Test-Path -Path $dummykey) -and (Test-Path -Path "$dummykey.pub")) {
 }
 
 # Uninstall vscode-remote-hpc again and ensure existing config is preserved
-Write-Host "Uninstalling vscode-remote-hpc" -ForegroundColor Yellow
+Write-Host "Uninstalling vscode-remote-hpc preserving original ssh config + keys" -ForegroundColor Yellow
 & $VSRsetup $VSRtester $VSRhead
 
 # Ensure ssh config file is still present
