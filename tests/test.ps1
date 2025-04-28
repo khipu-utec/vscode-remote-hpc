@@ -15,13 +15,13 @@ $VSRsetup = Resolve-Path $VSRsetup
 # Test parameters (set as appropriate)
 $VSRtester = "testuser"
 $VSRhead = "hpc-head.domain.local"
-$dummykey = "$sshdir\dummy"
 
 # Default ssh config/key location
 $sshdir = "$HOME\.ssh"
 $sshconfig = "$sshdir\config"
 $sshconfigbak = "${sshconfig}_$(get-date -f yyyy-MM-dd).vsr"
 $sshkey = "$sshdir\vscode-remote-hpc"
+$dummykey = "$sshdir\dummy"
 
 # Prepare what the expected Host block added by vscode-remote-hpc should look like
 $expectedconfig = @"
@@ -31,6 +31,12 @@ Host vscode-remote-hpc
     ProxyCommand ssh $VSRtester@$VSRhead ""/usr/local/bin/vscode-remote connect""
     StrictHostKeyChecking no
 "@.Trim()
+
+# Check for existing ssh keys/config
+if ((Test-Path -Path $sshkey) -or (Test-Path -Path "$sshkey.pub") (Test-Path -Path $sshconfig)) {
+    Write-Host "Error: cannot run tests with existing ssh keys/config file" -ForegroundColor Red
+    exit 1
+}
 
 # Run the setup w/input args to suppress interactive prompts
 Write-Host "Installing vscode-remote-hpc"
