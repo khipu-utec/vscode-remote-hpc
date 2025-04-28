@@ -9,7 +9,7 @@
 
 # Get correct path to setup script
 $Testsdir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$VSRsetup = Join-Path $Testsdir "..\here\add_vscode_host.ps1"
+$VSRsetup = Join-Path $Testsdir "..\client\setup.ps1"
 $VSRsetup = Resolve-Path $VSRsetup
 
 # Test parameters (Set as appropriate)
@@ -26,7 +26,7 @@ $expectedconfig = @"
 Host vscode-remote-hpc
     User $VSRtester
     IdentityFile $sshkey
-    ProxyCommand ssh $VSRtester@$VSRhead ""~/bin/vscode-remote cpu""
+    ProxyCommand ssh $VSRtester@$VSRhead ""/usr/local/bin/vscode-remote cpu""
     StrictHostKeyChecking no
 "@.Trim()
 
