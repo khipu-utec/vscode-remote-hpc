@@ -50,6 +50,8 @@ wait for it to start, and connect to the node as soon as the job is running.
 Thus, controlling VS Code remote HPC sessions can be done exclusively from 
 within VS Code itself. 
 
+![](https://github.com/esi-neuroscience/vscode-remote-hpc/blob/main/doc/media/vscode_remote_hpc_demo.gif)
+
 Running jobs are automatically reused. If a running job is found, the script simply 
 connects to it. You can safely open many remote windows and they will all share 
 the same SLURM job. 
