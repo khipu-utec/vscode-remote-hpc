@@ -42,6 +42,8 @@ Open a terminal (`Terminal.App` in macOS) and run the following command:
 curl -fsSL https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/heads/main/client/setup.sh | bash
 ```
 
+![](https://github.com/esi-neuroscience/vscode-remote-hpc/blob/main/doc/media/vscode_remote_hpc_demo.gif)
+
 ## Usage
 
 The `vscode-remote-hpc` host is now available in the VS Code Remote Explorer. 
@@ -49,8 +51,6 @@ Connecting to this host will automatically launch a sbatch job on a HPC compute 
 wait for it to start, and connect to the node as soon as the job is running.
 Thus, controlling VS Code remote HPC sessions can be done exclusively from 
 within VS Code itself. 
-
-![](https://github.com/esi-neuroscience/vscode-remote-hpc/blob/main/doc/media/vscode_remote_hpc_demo.gif)
 
 Running jobs are automatically reused. If a running job is found, the script simply 
 connects to it. You can safely open many remote windows and they will all share 
