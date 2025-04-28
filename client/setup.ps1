@@ -18,6 +18,7 @@ param(
 # Default ssh config/key location
 $sshdir = "$HOME\.ssh"
 $sshconfig = "$sshdir\config"
+$sshconfigbak = "${sshconfig}_$(get-date -f yyyy-MM-dd).vsr"
 $sshkey = "$sshdir\vscode-remote-hpc"
 
 Write-Output "--- This script sets up VS Code remote connections to the HPC cluster ---"
@@ -39,7 +40,6 @@ if ((Test-Path $sshconfig) -and (Test-Path $sshkey)) {
         '2' {
             Write-Output "Removing vscode-remote-hpc ssh configuration entry"
             if (Test-Path $sshconfig) {
-                sshconfigbak = "$sshconfig.bak"
                 Copy-Item -Path "$sshconfig" -Destination "$sshconfigbak" -Force
                 Write-Output "Wrote backup-copy $sshconfigbak of current ssh configuration file"
                 $lines = Get-Content $sshconfig
@@ -108,9 +108,11 @@ if (-not (Test-Path -Path $sshdir)) {
     New-Item -ItemType Directory -Path $sshdir | Out-Null
 }
 
-# Create config file if it doesn't exist
+# Create config file if it doesn't exist; create backup copy if it does
 if (-not (Test-Path -Path $sshconfig)) {
     New-Item -ItemType File -Path $sshconfig | Out-Null
+} else {
+    Copy-Item -Path "$sshconfig" -Destination "$sshconfigbak" -Force
 }
 
 # Check for existing Host block
