@@ -33,7 +33,7 @@ Host vscode-remote-hpc
 "@.Trim()
 
 # Check for existing ssh keys/config
-if ((Test-Path -Path $sshkey) -or (Test-Path -Path "$sshkey.pub") (Test-Path -Path $sshconfig)) {
+if ((Test-Path -Path $sshkey) -or (Test-Path -Path "$sshkey.pub") -or (Test-Path -Path $sshconfig)) {
     Write-Host "Error: cannot run tests with existing ssh keys/config file" -ForegroundColor Red
     exit 1
 }
