@@ -16,10 +16,14 @@ Write-Output "--- This script sets up VS Code remote connections to the HPC clus
 
 # Check if vscode-remote-hpc has already been setup
 if ((Test-Path $sshconfig) -and (Test-Path $sshkey)) {
-    Write-Output "It seems vscode-remote-hpc is already installed. How do you want to proceed?"
-    Write-Output "1. Abort"
-    Write-Output "2. Uninstall"
-    $choice = Read-Host "Please choose an option (1 or 2)"
+    if (-not $Env:VSRunattended) {
+        Write-Output "It seems vscode-remote-hpc is already installed. How do you want to proceed?"
+        Write-Output "1. Abort"
+        Write-Output "2. Uninstall"
+        $choice = Read-Host "Please choose an option (1 or 2)"
+    } else {
+        $choice = '2'
+    }
     switch ($choice) {
         '1' {
             exit
@@ -64,19 +68,24 @@ if ((Test-Path $sshconfig) -and (Test-Path $sshkey)) {
             Remove-Item -Path "$sshkey.pub" -Force -ErrorAction SilentlyContinue
             Write-Output "Done"
             Write-Output "All cleaned up, vscode-remote-hpc has been uninstalled. Bye. "
-            exit
+            return
         }
         Default {
             Write-Output "Invalid choice. Aborting."
-            exit
+            return
         }
     }
 }
 
 # Query account/head node information
-$uname = Read-Host "Please enter your HPC uname: "
-Write-Output "Please enter the IP address or hostname of the cluster head node"
-$headnode = Read-Host "(hub.esi.local at ESI, or 192.168.161.221 at CoBIC): "
+if (-not $Env:VSRunattended) {
+    $uname = Read-Host "Please enter your HPC uname: "
+    Write-Output "Please enter the IP address or hostname of the cluster head node"
+    $headnode = Read-Host "(hub.esi.local at ESI, or 192.168.161.221 at CoBIC): "
+} else {
+    $uname = "VSRtester"
+    $headnode = "VSRheadnode"
+}
 
 # Put together configuration block for ssh config
 $configblock = @"
