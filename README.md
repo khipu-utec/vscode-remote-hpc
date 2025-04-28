@@ -42,9 +42,9 @@ Open a terminal (`Terminal.App` in macOS) and run the following command:
 curl -fsSL https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/heads/main/client/setup.sh | bash
 ```
 
-![](https://github.com/esi-neuroscience/vscode-remote-hpc/blob/main/doc/media/vscode_remote_hpc_demo.gif)
-
 ## Usage
+
+![](https://github.com/esi-neuroscience/vscode-remote-hpc/blob/main/doc/media/vscode_remote_hpc_demo.gif)
 
 The `vscode-remote-hpc` host is now available in the VS Code Remote Explorer. 
 Connecting to this host will automatically launch a sbatch job on a HPC compute node, 
