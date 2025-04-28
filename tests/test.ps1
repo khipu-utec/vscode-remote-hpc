@@ -39,7 +39,7 @@ if ((Test-Path -Path $sshkey) -or (Test-Path -Path "$sshkey.pub") -or (Test-Path
 }
 
 # Run the setup w/input args to suppress interactive prompts
-Write-Host "Installing vscode-remote-hpc"
+Write-Host "Installing vscode-remote-hpc" -ForegroundColor Yellow
 & $VSRsetup $VSRtester $VSRhead
 
 # First and foremost: ensure ssh config has been created
@@ -65,7 +65,7 @@ if ($match.Success) {
         exit 1
     }
 } else {
-    Write-Host "Test failed: Host block not found in config file." -ForegroundColor Red
+    Write-Host "Test failed: Host block not found in config file $sshconfig" -ForegroundColor Red
     exit 1
 }
 
@@ -78,7 +78,7 @@ if ((Test-Path -Path $sshkey) -and (Test-Path -Path "$sshkey.pub")) {
 }
 
 # Uninstall vscode-remote-hpc
-Write-Host "Uninstalling vscode-remote-hpc"
+Write-Host "Uninstalling vscode-remote-hpc" -ForegroundColor Yellow
 & $VSRsetup $VSRtester $VSRhead
 
 # Ensure ssh config file is still present
@@ -124,7 +124,7 @@ Host VeryImportant
 Add-Content -Path $sshconfig -Value "`n$dummyblock"
 
 # Re-run the setup and ensure existing config + keys stay intact
-Write-Host "Re-install vscode-remote-hpc with existing ssh config + keys"
+Write-Host "Re-install vscode-remote-hpc with existing ssh config + keys" -ForegroundColor Yellow
 & $VSRsetup $VSRtester $VSRhead
 
 # Ensure backup copy of ssh configuration has been created
@@ -151,7 +151,7 @@ if ($match.Success) {
         exit 1
     }
 } else {
-    Write-Host "Test failed: Host block not found in backup config file." -ForegroundColor Red
+    Write-Host "Test failed: Host block not found in backup config file $sshconfigbak" -ForegroundColor Red
     exit 1
 }
 
@@ -172,7 +172,7 @@ if ($match.Success) {
         exit 1
     }
 } else {
-    Write-Host "Test failed: Host block not found in config file." -ForegroundColor Red
+    Write-Host "Test failed: Host block not found in config file $sshconfig" -ForegroundColor Red
     exit 1
 }
 $match = [regex]::Match($configblock, "(^Host\s+VeryImportant.*?)(?:(?:^Host|\z))", [System.Text.RegularExpressions.RegexOptions]::Multiline -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
@@ -189,7 +189,7 @@ if ($match.Success) {
         exit 1
     }
 } else {
-    Write-Host "Test failed: Host block not found in config file." -ForegroundColor Red
+    Write-Host "Test failed: Host block not found in config file $sshconfig" -ForegroundColor Red
     exit 1
 }
 
@@ -209,4 +209,43 @@ if ((Test-Path -Path $dummykey) -and (Test-Path -Path "$dummykey.pub")) {
     exit 1
 }
 
-Write-Host "ALL PASSED"
+# Uninstall vscode-remote-hpc again and ensure existing config is preserved
+Write-Host "Uninstalling vscode-remote-hpc" -ForegroundColor Yellow
+& $VSRsetup $VSRtester $VSRhead
+
+# Ensure ssh config file is still present
+if (Test-Path -Path $sshconfig) {
+    Write-Host "Test passed: ssh config file still present" -ForegroundColor Green
+} else {
+    Write-Host "Test failed: ssh config file has been removed" -ForegroundColor Red
+}
+
+# Ensure vscode-remote-hpc config block has been wiped from config file but
+# previous ssh configuration has not been removed
+$configblock = Get-Content $sshconfig -Raw
+$match = [regex]::Match($configblock, "(^Host\s+vscode-remote-hpc.*?)(?:(?:^Host|\z))", [System.Text.RegularExpressions.RegexOptions]::Multiline -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
+if (-not $match.Success) {
+    Write-Host "Test passed: Host block removed from config file." -ForegroundColor Green
+} else {
+    Write-Host "Test failed: Host block still present in config file." -ForegroundColor Red
+    exit 1
+}
+$match = [regex]::Match($configblock, "(^Host\s+VeryImportant.*?)(?:(?:^Host|\z))", [System.Text.RegularExpressions.RegexOptions]::Multiline -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
+if ($match.Success) {
+    $actualconfig = $match.Groups[1].Value.Trim()
+    if ($actualconfig -eq $dummyblock) {
+        Write-Host "Test passed: Original ssh config has been preserved." -ForegroundColor Green
+    } else {
+        Write-Host "Test failed: Original ssh config not matched in $sshconfig." -ForegroundColor Red
+        Write-Host "Expected:"
+        Write-Host $dummyblock
+        Write-Host "Actual:"
+        Write-Host $actualconfig
+        exit 1
+    }
+} else {
+    Write-Host "Test failed: Original ssh config not found in config file $sshconfig" -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "ALL PASSED" -ForegroundColor Green
