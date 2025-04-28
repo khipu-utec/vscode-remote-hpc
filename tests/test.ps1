@@ -64,7 +64,7 @@ if ($match.Success) {
 }
 
 # Ensure ssh keys have been generated
-if ((Test-Path -Path $sshkey) and (Test-Path -Path "$sshkey.pub")) {
+if ((Test-Path -Path $sshkey) -and (Test-Path -Path "$sshkey.pub")) {
     Write-Host "Test passed: ssh keys generated." -ForegroundColor Green
 } else {
     Write-Host "Test failed: ssh keys not found." -ForegroundColor Red
@@ -188,7 +188,7 @@ if ($match.Success) {
 }
 
 # Ensure vscode-remote-hpc ssh keys have been generated
-if ((Test-Path -Path $sshkey) and (Test-Path -Path "$sshkey.pub")) {
+if ((Test-Path -Path $sshkey) -and (Test-Path -Path "$sshkey.pub")) {
     Write-Host "Test passed: ssh keys generated." -ForegroundColor Green
 } else {
     Write-Host "Test failed: ssh keys not found." -ForegroundColor Red
@@ -196,7 +196,7 @@ if ((Test-Path -Path $sshkey) and (Test-Path -Path "$sshkey.pub")) {
 }
 
 # Ensure existing ssh keys have been preserved
-if ((Test-Path -Path $dummykey) and (Test-Path -Path "$dummykey.pub")) {
+if ((Test-Path -Path $dummykey) -and (Test-Path -Path "$dummykey.pub")) {
     Write-Host "Test passed: Existing ssh keys have been preserved." -ForegroundColor Green
 } else {
     Write-Host "Test failed: Existing ssh keys not found." -ForegroundColor Red
