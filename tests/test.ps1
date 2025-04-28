@@ -101,7 +101,7 @@ if (-not $match.Success) {
 }
 
 # Ensure ssh keys have been removed
-if ((Test-Path -Path $sshkey) or (Test-Path -Path "$sshkey.pub")) {
+if ((Test-Path -Path $sshkey) -or (Test-Path -Path "$sshkey.pub")) {
     Write-Host "Test failed: ssh key pair still present." -ForegroundColor Red
     exit 1
 } else {
