@@ -4,6 +4,8 @@ in Cooperation with Max Planck Society
 SPDX-License-Identifier: CC-BY-NC-SA-1.0
 -->
 
+[![Test Setup](https://github.com/esi-neuroscience/vscode-remote-hpc/actions/workflows/test-setup.yml/badge.svg)](https://github.com/esi-neuroscience/vscode-remote-hpc/actions/workflows/test-setup.yml)
+
 # VS Code Remote HPC
 
 Scripts for connecting [VS Code](https://code.visualstudio.com/download) to a 
