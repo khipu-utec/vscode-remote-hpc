@@ -5,6 +5,7 @@ SPDX-License-Identifier: CC-BY-NC-SA-1.0
 -->
 
 [![Test Setup](https://github.com/esi-neuroscience/vscode-remote-hpc/actions/workflows/test-setup.yml/badge.svg)](https://github.com/esi-neuroscience/vscode-remote-hpc/actions/workflows/test-setup.yml)
+[![REUSE status](https://api.reuse.software/badge/github.com/esi-neuroscience/vscode-remote-hpc)](https://api.reuse.software/info/github.com/esi-neuroscience/vscode-remote-hpc)
 
 # VS Code Remote HPC
 
