@@ -8,8 +8,6 @@
 # SPDX-License-Identifier: MIT
 #
 
-set -e
-
 # Keep it simple in case we're running in a POSIX-shell
 posix_abort() {
   printf "ERROR: %s\n" "$@" >&2
@@ -60,9 +58,7 @@ chomp()
 
 passed()
 {
-  if [[ ! -z "${backupdebug-}" ]]; then
-    printf "${tty_green}PASSED: ${tty_reset}%s\n" "$(shell_join "$@")"
-  fi
+  printf "${tty_green}PASSED: ${tty_reset}%s\n" "$(shell_join "$@")"
 }
 
 info()
@@ -96,7 +92,7 @@ read -r -d '' expectedconfig <<EOF
 Host vscode-remote-hpc
     User ${VSRtester}
     IdentityFile ${sshkey}
-    ProxyCommand ssh ${VSRtester}@${VSRhead} \"/usr/local/bin/vscode-remote connect\"
+    ProxyCommand ssh ${VSRtester}@${VSRhead} "/usr/local/bin/vscode-remote connect"
     StrictHostKeyChecking no
 EOF
 
@@ -120,14 +116,16 @@ fi
 
 # Function: extract a host block by name from $1 file
 get_host_block() {
-    blockname="$1"
-    awk -v host="Host ${blockname}" '
-      $0 ~ "^Host[[:space:]]+"host"$" {printflag=1}
-      printflag {print}
-      ($0 ~ /^Host / && $0 !~ "^Host[[:space:]]+"host"$" && NR>1) {printflag=0}
-    ' "$2" | sed '/^$/d'
+  # $1 = block name, $2 = file
+  awk -v block="$1" '
+    # Match start of the requested host block
+    ($1 == "Host" && $2 == block) {inblock=1; print $0; next}
+    # If in the right block and the line starts with Host (new block) and not the same block: stop
+    (inblock && $1 == "Host" && $2 != block) {inblock=0}
+    # Print all lines while in the block
+    inblock {print $0}
+  ' "$2" | sed '/^[[:space:]]*$/d'
 }
-
 # Compare actual config to expected
 actualconfig=$(get_host_block "vscode-remote-hpc" "${sshconfig}")
 if [ "${actualconfig}" == "${expectedconfig}" ]; then
