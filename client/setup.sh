@@ -11,6 +11,7 @@
 # Default ssh config/key location
 sshdir="${HOME}/.ssh"
 sshconfig="${sshdir}/config"
+sshconfigbak="${sshconfig}_$(date +%Y-%m-%d).vsr"
 sshkey="${sshdir}/vscode-remote-hpc"
 
 echo "--- This script sets up VS Code remote connections to the HPC cluster ---"
@@ -27,8 +28,8 @@ if [[ -f "${sshconfig}" && -f "${sshkey}" ]]; then
             ;;
         2)
             if [[ -f "${sshconfig}" ]]; then
-                sshconfigbak="${sshconfig}.bak"
                 cp -f "${sshconfig}" "${sshconfigbak}"
+                echo "Wrote backup-copy ${sshconfigbak} of current ssh configuration file"
                 awk '
                     BEGIN {skip=0}
                     /^\s*Host\s+vscode-remote-hpc\s*$/ {skip=1; next}
@@ -74,10 +75,12 @@ if [ ! -d "${sshdir}" ]; then
     chmod 700 "${sshdir}"
 fi
 
-# Create config file if it doesn't exist
+# Create config file if it doesn't exist; create backup copy if it does
 if [ ! -f "${sshconfig}" ]; then
     touch "${sshconfig}"
     chmod 600 "${sshconfig}"
+else
+    cp -f "${sshconfig}" "${sshconfigbak}"
 fi
 
 # Check for existing Host block
