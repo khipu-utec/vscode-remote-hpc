@@ -44,12 +44,12 @@ if [[ -f "${sshconfig}" && -f "${sshkey}" ]]; then
                 cp -f "${sshconfig}" "${sshconfigbak}"
                 echo "Wrote backup-copy ${sshconfigbak} of current ssh configuration file"
                 awk '
-                    BEGIN {skip=0}
-                    /^\s*Host\s+vscode-remote-hpc\s*$/ {skip=1; next}
-                    skip && /^[ \t]/ {next}
-                    skip && /^[[:space:]]*$/ {next}
-                    skip {skip=0}
-                    {print}
+                   BEGIN {skip=0}
+                   /^[ \t]*Host[ \t]+vscode-remote-hpc[ \t]*$/ {skip=1; next}
+                   skip && /^[ \t]/ {next}
+                   skip && /^[[:space:]]*$/ {next}
+                   skip {skip=0}
+                   {print}
                 ' "${sshconfig}" > "${sshconfig}.tmp" && mv "${sshconfig}.tmp" "${sshconfig}"
                 echo "Block for vscode-remote-hpc has been removed from ${sshconfig} (if it was present)."
             else

@@ -194,6 +194,9 @@ EOF
 echo "" >> "${sshconfig}"
 echo "${dummyblock}" >> "${sshconfig}"
 
+# Remove whitespaces for string comparison below
+dummy_trim="$(echo "${dummyblock}" | sed 's/^[ \t]*//;s/[ \t]*$//')"
+
 # Re-run the setup and ensure existing config + keys stay intact
 info "Re-install vscode-remote-hpc with existing ssh config + keys"
 "${VSRsetup}" "${VSRtester}" "${VSRhead}"
@@ -206,12 +209,10 @@ else
     exit 1
 fi
 
-# Ensure backup copy contains orig config
+# Ensure backup copy contains orig config (trim whitespaces)
 actualconfig=$(get_host_block "VeryImportant" "${sshconfigbak}")
-# Remove leading/trailing whitespace:
-actualconfig="$(echo "${actualconfig}" | sed 's/^[ \t]*//;s/[ \t]*$//')"
-db_trim="$(echo "${dummyblock}" | sed 's/^[ \t]*//;s/[ \t]*$//')"
-if [ "${actualconfig}" == "${db_trim}" ]; then
+actual_trim="$(echo "${actualconfig}" | sed 's/^[ \t]*//;s/[ \t]*$//')"
+if [ "${actual_trim}" == "${dummy_trim}" ]; then
     passed "Original ssh config preserved in backup config file ${sshconfigbak}"
 else
     error "Original ssh config not matched in backup config file ${sshconfigbak}"
@@ -234,8 +235,11 @@ else
     error "${actualconfig}"
     exit 1
 fi
+
+# Ensure original config block has been preserved (trim whitespaces)
 actualconfig=$(get_host_block "VeryImportant" "${sshconfig}")
-if [ "${actualconfig}" == "${db_trim}" ]; then
+actual_trim="$(echo "${actualconfig}" | sed 's/^[ \t]*//;s/[ \t]*$//')"
+if [ "${actual_trim}" == "${dummy_trim}" ]; then
     passed "Existing ssh config has been preserved in ${sshconfig}"
 else
     error "Existing ssh config not found in ${sshconfig}"
@@ -281,9 +285,9 @@ else
     error "Host block still present in config file ${sshconfig}"
     exit 1
 fi
-
 actualconfig=$(get_host_block "VeryImportant" "${sshconfig}")
-if [ "${actualconfig}" == "${db_trim}" ]; then
+actual_trim="$(echo "${actualconfig}" | sed 's/^[ \t]*//;s/[ \t]*$//')"
+if [ "${actual_trim}" == "${dummy_trim}" ]; then
     passed "Original ssh config has been preserved in ${sshconfig}"
 else
     error "Original ssh config not matched in ${sshconfig}"
