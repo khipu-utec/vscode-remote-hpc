@@ -1,4 +1,4 @@
-name: Test setting up vscode-remote-hpc on Windows/macOS/Linux
+name: Test Setup
 run-name: ${{ github.actor }} is running tests
 on: [push]
 jobs:
