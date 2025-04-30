@@ -47,6 +47,7 @@ if (Test-Path -Path $sshconfig) {
     Write-Host "Test passed: ssh config file has been created" -ForegroundColor Green
 } else {
     Write-Host "Test failed: ssh config file not found" -ForegroundColor Red
+    exit 1
 }
 
 # Read the actual ssh config file and regex to extract ssh configuration added by vscode-remote-hpc
@@ -86,6 +87,7 @@ if (Test-Path -Path $sshconfig) {
     Write-Host "Test passed: ssh config file still present" -ForegroundColor Green
 } else {
     Write-Host "Test failed: ssh config file has been removed" -ForegroundColor Red
+    exit 1
 }
 
 # Ensure backup copy of ssh configuration has been created
@@ -218,6 +220,7 @@ if (Test-Path -Path $sshconfig) {
     Write-Host "Test passed: ssh config file still present" -ForegroundColor Green
 } else {
     Write-Host "Test failed: ssh config file has been removed" -ForegroundColor Red
+    exit 1
 }
 
 # Ensure vscode-remote-hpc config block has been wiped from config file but
