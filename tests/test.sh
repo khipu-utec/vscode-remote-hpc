@@ -61,18 +61,18 @@ chomp()
 passed()
 {
   if [[ ! -z "${backupdebug-}" ]]; then
-    printf "$(datefmt) ${tty_green}PASSED: ${tty_reset}%s\n" "$(shell_join "$@")" | tee -a "${log}"
+    printf "${tty_green}PASSED: ${tty_reset}%s\n" "$(shell_join "$@")" | tee -a "${log}"
   fi
 }
 
 info()
 {
-  printf "$(datefmt) ${tty_blue}===${tty_bold} %s${tty_reset}\n" "$(shell_join "$@")" | tee -a "${log}"
+  printf "${tty_blue}===${tty_bold} %s${tty_reset}\n" "$(shell_join "$@")" | tee -a "${log}"
 }
 
 error()
 {
-  printf "$(datefmt) ${tty_red}ERROR:${tty_bold} %s${tty_reset}\n" "$(chomp "$1")" | tee -a "${log}"
+  printf "${tty_red}ERROR:${tty_bold} %s${tty_reset}\n" "$(chomp "$1")" | tee -a "${log}"
 }
 
 # Get correct path to setup script
@@ -87,7 +87,6 @@ VSRhead="hpc-head.domain.local"
 # Default ssh config/key location
 sshdir="${HOME}/.ssh"
 sshconfig="${sshdir}/config"
-tstamp="$(date +%Y-%m-%d)"
 sshconfigbak="${sshconfig}_$(date +%Y-%m-%d).vsr"
 sshkey="${sshdir}/vscode-remote-hpc"
 dummykey="${sshdir}/dummy"
