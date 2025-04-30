@@ -8,6 +8,7 @@
 #
 
 # Either query for HPC username and headnode or take CLI arguments
+# (mainly intended for testing!)
 param(
     [Parameter(Position=0, Mandatory=$false)]
     [string]$uname,
