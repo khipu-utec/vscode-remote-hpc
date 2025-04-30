@@ -1,0 +1,31 @@
+name: Test setting up vscode-remote-hpc on Windows/macOS/Linux
+run-name: ${{ github.actor }} is running tests
+on: [push]
+jobs:
+  Test-Setup:
+    name: Run tests on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "macos-latest", "windows-latest", "ubuntu-latest"]
+        include:
+          - os: windows-latest
+            test_script: .\tests\test.ps1
+            use_shell : pwsh
+          - os: macos-latest
+            test_script: ./tests/test.sh
+            use_shell : zsh -il {0}
+            prepare_shell: source ~/.zshrc
+          - os: ubuntu-latest
+            test_script: ./tests/test.sh
+            use_shell : bash -il {0}
+            prepare_shell: source ~/.bashrc
+    defaults:
+      run:
+        shell: ${{ matrix.use_shell }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Run test script ${{ matrix.test_script }} for ${{ matrix.os }}
+        run: ${{ matrix.test_script }}
