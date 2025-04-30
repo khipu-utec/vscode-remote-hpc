@@ -80,11 +80,6 @@ testsdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VSRsetup="$testsdir/../client/setup.sh"  # Assume .sh equivalent
 VSRsetup="$(realpath "$VSRsetup")"
 
-
-echo "VRsetup=$VSRsetup"
-
-exit 0
-
 # Test parameters (set as appropriate)
 VSRtester="testuser"
 VSRhead="hpc-head.domain.local"
