@@ -61,18 +61,18 @@ chomp()
 passed()
 {
   if [[ ! -z "${backupdebug-}" ]]; then
-    printf "${tty_green}PASSED: ${tty_reset}%s\n" "$(shell_join "$@")" | tee -a "${log}"
+    printf "${tty_green}PASSED: ${tty_reset}%s\n" "$(shell_join "$@")"
   fi
 }
 
 info()
 {
-  printf "${tty_blue}===${tty_bold} %s${tty_reset}\n" "$(shell_join "$@")" | tee -a "${log}"
+  printf "${tty_blue}===${tty_bold} %s${tty_reset}\n" "$(shell_join "$@")"
 }
 
 error()
 {
-  printf "${tty_red}ERROR:${tty_bold} %s${tty_reset}\n" "$(chomp "$1")" | tee -a "${log}"
+  printf "${tty_red}FAILED:${tty_bold} %s${tty_reset}\n" "$(chomp "$1")"
 }
 
 # Get correct path to setup script
