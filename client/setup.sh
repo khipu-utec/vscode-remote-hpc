@@ -116,7 +116,7 @@ if [ ! -f "${sshkey}" ]; then
     fi
     ssh-keygen -q -f "${sshkey}" -t ed25519 -N ""
     if [[ $# -eq 0 ]]; then
-        ssh-copy-id -i "${sshkey}" "${headnode}"
+        ssh-copy-id -i "${sshkey}" "${uname}@${headnode}"
     fi
 else
     echo "VS Code remote ssh key already exists. No changes made."
