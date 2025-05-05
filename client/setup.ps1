@@ -130,7 +130,7 @@ if (-not (Test-Path -Path $sshkey)) {
    if ($PSBoundParameters.Count -eq 0) {
       $ans = Read-Host "About to create and upload an ssh key to $headnode. You will be prompted for your cluster password. Press any key to continue "
    }
-   ssh-keygen -q -f $sshkey -t ed25519 -N '""'
+   ssh-keygen -q -f $sshkey -t ed25519 -C "vscode-remote-hpc@${env:COMPUTERNAME}" -N '""'
    if ($PSBoundParameters.Count -eq 0) {
       type "$sshkey.pub" | ssh $uname@$headnode "cat >> ~/.ssh/authorized_keys"
    }

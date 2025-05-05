@@ -114,7 +114,11 @@ if [ ! -f "${sshkey}" ]; then
     if [[ $# -eq 0 ]]; then
         read -p "About to create and upload an ssh key to ${headnode}. You will be prompted for your cluster password. Press any key to continue " ans </dev/tty
     fi
-    ssh-keygen -q -f "${sshkey}" -t ed25519 -N ""
+    machine="${HOST}"
+    if [ -z "${machine}" ]; then
+        machine="${HOSTNAME}"
+    fi
+    ssh-keygen -q -f "${sshkey}" -t ed25519 -C "vscode-remote-hpc@${machine}" -N ""
     if [[ $# -eq 0 ]]; then
         ssh-copy-id -i "${sshkey}" "${uname}@${headnode}"
     fi
