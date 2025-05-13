@@ -17,10 +17,12 @@ param(
 )
 
 # Default ssh config/key location
-$sshdir = "$HOME\.ssh"
+$sshdirname = ".ssh"
+$sshkeyname = "vscode-remote-hpc"
+$sshdir = "$HOME\$sshdirname"
 $sshconfig = "$sshdir\config"
 $sshconfigbak = "${sshconfig}_$(get-date -f yyyy-MM-dd).vsr"
-$sshkey = "$sshdir\vscode-remote-hpc"
+$sshkey = "$sshdir\$sshkeyname"
 
 Write-Output "--- This script sets up VS Code remote connections to the HPC cluster ---"
 
@@ -99,7 +101,7 @@ if (-not $headnode) {
 $configblock = @"
 Host vscode-remote-hpc
     User $uname
-    IdentityFile $sshkey
+    IdentityFile ~/$sshdirname/$sshkeyname
     ProxyCommand ssh $uname@$headnode ""/usr/local/bin/vscode-remote connect""
     StrictHostKeyChecking no
 "@

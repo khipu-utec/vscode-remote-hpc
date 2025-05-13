@@ -27,7 +27,7 @@ $dummykey = "$sshdir\dummy"
 $expectedconfig = @"
 Host vscode-remote-hpc
     User $VSRtester
-    IdentityFile $sshkey
+    IdentityFile ~/.ssh/vscode-remote-hpc
     ProxyCommand ssh $VSRtester@$VSRhead ""/usr/local/bin/vscode-remote connect""
     StrictHostKeyChecking no
 "@.Trim()
