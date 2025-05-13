@@ -127,6 +127,7 @@ function connect () {
 
     while ! nc -z $JOB_NODE $JOB_PORT; do
         timeout
+        elapsed=0
         # Sleep 1 second (w/o spawning a subprocess)
         while [ "${elapsed}" -lt 1 ]; do
             elapsed=$((SECONDS - $tstart))
