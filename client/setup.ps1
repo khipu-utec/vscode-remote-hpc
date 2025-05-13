@@ -17,7 +17,7 @@ param(
 )
 
 # Default ssh config/key location
-$sshdir = "$HOME\.ssh"
+$sshdir = "~\.ssh"
 $sshconfig = "$sshdir\config"
 $sshconfigbak = "${sshconfig}_$(get-date -f yyyy-MM-dd).vsr"
 $sshkey = "$sshdir\vscode-remote-hpc"
