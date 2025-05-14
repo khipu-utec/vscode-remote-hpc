@@ -151,7 +151,8 @@ fi
 
 # Query account/head node information
 if [[ -z "${uname+x}" ]]; then
-    read -p "Please enter your HPC username: " uname </dev/tty
+    info "Please enter your HPC username:"
+    read -p "" uname </dev/tty
 fi
 if [[ -z "${headnode+x}" ]]; then
     info "Please enter the IP address or hostname of the cluster head node"

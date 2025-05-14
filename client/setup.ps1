@@ -92,7 +92,7 @@ if ((Test-Path $sshconfig) -and (Test-Path $sshkey)) {
             }
         '2' {
             Cleanup
-            Announce "All cleaned up, vscode-remote-hpc has been uninstalled. Bye. "
+            Announce "All cleaned up, vscode-remote-hpc has been uninstalled. Bye."
             return
         }
         Default {
@@ -104,7 +104,8 @@ if ((Test-Path $sshconfig) -and (Test-Path $sshkey)) {
 
 # Query account/head node information
 if (-not $uname) {
-    $uname = Read-Host "Please enter your HPC uname: "
+    Info "Please enter your HPC username:"
+    $uname = Read-Host ""
 }
 if (-not $headnode) {
     Info "Please enter the IP address or hostname of the cluster head node"
