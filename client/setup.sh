@@ -8,6 +8,8 @@
 # SPDX-License-Identifier: MIT
 #
 
+set -e
+
 # Either query for HPC username and headnode or take CLI arguments
 # (mainly intended for testing!)
 if [ -n "$1" ]; then
