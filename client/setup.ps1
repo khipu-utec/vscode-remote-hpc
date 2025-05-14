@@ -154,7 +154,8 @@ if (-not (Test-Path -Path $sshkey)) {
       throw "ssh-keygen failed"
    }
    if ($PSBoundParameters.Count -eq 0) {
-      type "$sshkey.pub" | ssh $uname@$headnode "cat >> ~/.ssh/authorized_keys"
+      $cleankey = ([System.Text.Encoding]::UTF8.GetString((Get-Content "$sshkey.pub" -Encoding Byte))) -replace '^\uFEFF', '' -replace '[\r\n]', ''
+      $cleankey | ssh $uname@$headnode "cat >> ~/.ssh/authorized_keys"
       if (-not $?){
          throw "ssh-key upload failed"
       }
