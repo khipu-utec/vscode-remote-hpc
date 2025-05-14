@@ -95,6 +95,7 @@ on_exit() {
 }
 trap 'on_exit 2> /dev/null' SIGHUP SIGTERM SIGKILL EXIT
 
+# Helper to undo any changes made to the user's machine
 cleanup(){
     if [[ -f "${sshconfig}" ]]; then
         cp -f "${sshconfig}" "${sshconfigbak}"
@@ -192,7 +193,7 @@ fi
 if [ ! -f "${sshkey}" ]; then
     if [[ $# -eq 0 ]]; then
         info "About to create and upload an ssh key to ${headnode}"
-        info "You will be prompted for your cluster password."
+        info "You will be prompted for your cluster password"
         read -p "Press any key to continue " ans </dev/tty
     fi
     machine="${HOST}"
