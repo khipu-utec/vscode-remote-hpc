@@ -105,7 +105,7 @@ if ((Test-Path $sshconfig) -and (Test-Path $sshkey)) {
 # Query account/head node information
 if (-not $uname) {
     Info "Please enter your HPC username:"
-    $uname = Read-Host ""
+    $uname = Read-Host
 }
 if (-not $headnode) {
     Info "Please enter the IP address or hostname of the cluster head node"
