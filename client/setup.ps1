@@ -24,65 +24,79 @@ $sshconfig = "$sshdir\config"
 $sshconfigbak = "${sshconfig}_$(get-date -f yyyy-MM-dd).vsr"
 $sshkey = "$sshdir\$sshkeyname"
 
-Write-Output "--- This script sets up VS Code remote connections to the HPC cluster ---"
+# Helpers to prettify output
+function ErrorMsg($msg) { Write-Host "FAILED: $msg" -ForegroundColor Red }
+function Announce($msg) { Write-Host ">>> $msg <<<" -ForegroundColor Green }
+function Info($msg)    { Write-Host "$msg" -ForegroundColor Cyan }
+
+# Helper to undo any changes made to the user's machine
+function Cleanup {
+    if (Test-Path $sshconfig) {
+        Copy-Item -Path "$sshconfig" -Destination "$sshconfigbak" -Force
+        Info "Wrote backup-copy $sshconfigbak of current ssh configuration file"
+        $lines = Get-Content $sshconfig
+        $newLines = @()
+        $skipBlock = $false
+        foreach ($line in $lines) {
+            # Detect start of block
+            if ($line -match '^\s*Host\s+vscode-remote-hpc\s*$') {
+                $skipBlock = $true
+                continue
+            }
+            # If skipping block, skip indented lines; stop skipping on next non-indented/non-empty line
+            if ($skipBlock) {
+                if ($line -match '^\s' -or $line -match '^\t') {
+                    continue
+                } elseif ($line -match '^\s*$') {
+                    continue  # Skip empty lines directly after block, cosmetic
+                } else {
+                    $skipBlock = $false
+                    # fall through and add this line, out of block
+                }
+            }
+            if (-not $skipBlock) {
+                $newLines += $line
+            }
+        }
+        $newLines | Set-Content $sshconfig
+        Info "Block for vscode-remote-hpc has been removed from $sshconfig (if it was present)."
+    } else {
+        Info "$sshconfig does not exist. Nothing to remove."
+    }
+    Info "Removing generated ssh key-pair"
+    Remove-Item -Path "$sshkey" -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path "$sshkey.pub" -Force -ErrorAction SilentlyContinue
+    Info "Done"
+}
+
+# ----------------------------------------------------------------------
+#                    START OF INSTALLATION SCRIPT
+# ----------------------------------------------------------------------
+try {
+
+Announce "This script sets up VS Code remote connections to the HPC cluster"
 
 # Check if vscode-remote-hpc has already been setup
 if ((Test-Path $sshconfig) -and (Test-Path $sshkey)) {
     if ($PSBoundParameters.Count -eq 0) {
-        Write-Output "It seems vscode-remote-hpc is already installed. How do you want to proceed?"
-        Write-Output "1. Abort"
-        Write-Output "2. Uninstall"
+        Info "It seems vscode-remote-hpc is already installed. How do you want to proceed?"
+        Info "1. Abort"
+        Info "2. Uninstall"
         $choice = Read-Host "Please choose an option (1 or 2)"
     } else {
         $choice = '2'
     }
     switch ($choice) {
         '1' {
-            exit
+            return
             }
         '2' {
-            Write-Output "Removing vscode-remote-hpc ssh configuration entry"
-            if (Test-Path $sshconfig) {
-                Copy-Item -Path "$sshconfig" -Destination "$sshconfigbak" -Force
-                Write-Output "Wrote backup-copy $sshconfigbak of current ssh configuration file"
-                $lines = Get-Content $sshconfig
-                $newLines = @()
-                $skipBlock = $false
-                foreach ($line in $lines) {
-                    # Detect start of block
-                    if ($line -match '^\s*Host\s+vscode-remote-hpc\s*$') {
-                        $skipBlock = $true
-                        continue
-                    }
-                    # If skipping block, skip indented lines; stop skipping on next non-indented/non-empty line
-                    if ($skipBlock) {
-                        if ($line -match '^\s' -or $line -match '^\t') {
-                            continue
-                        } elseif ($line -match '^\s*$') {
-                            continue  # Skip empty lines directly after block, cosmetic
-                        } else {
-                            $skipBlock = $false
-                            # fall through and add this line, out of block
-                        }
-                    }
-                    if (-not $skipBlock) {
-                        $newLines += $line
-                    }
-                }
-                $newLines | Set-Content $sshconfig
-                Write-Output "Block for vscode-remote-hpc has been removed from $sshconfig (if it was present)."
-            } else {
-                Write-Output "$sshconfig does not exist. Nothing to remove."
-            }
-            Write-Output "Removing generated ssh key-pair"
-            Remove-Item -Path "$sshkey" -Force -ErrorAction SilentlyContinue
-            Remove-Item -Path "$sshkey.pub" -Force -ErrorAction SilentlyContinue
-            Write-Output "Done"
-            Write-Output "All cleaned up, vscode-remote-hpc has been uninstalled. Bye. "
+            Cleanup
+            Announce "All cleaned up, vscode-remote-hpc has been uninstalled. Bye. "
             return
         }
         Default {
-            Write-Output "Invalid choice. Aborting."
+            ErrorMsg "Invalid choice. Aborting."
             return
         }
     }
@@ -93,7 +107,7 @@ if (-not $uname) {
     $uname = Read-Host "Please enter your HPC uname: "
 }
 if (-not $headnode) {
-    Write-Output "Please enter the IP address or hostname of the cluster head node"
+    Info "Please enter the IP address or hostname of the cluster head node"
     $headnode = Read-Host "(hub.esi.local at ESI, or 192.168.161.221 at CoBIC): "
 }
 
@@ -122,22 +136,36 @@ if (-not (Test-Path -Path $sshconfig)) {
 $configText = Select-String -Path $sshconfig -Pattern "Host vscode-remote-hpc"
 if ($configText -eq $null){
     Add-Content -Path $sshconfig -Value "`n$configblock"
-    Write-Output "Updated ssh configuration"
+    Info "Updated ssh configuration"
 } else {
-    Write-Output "VS Code remote HPC configuration already exists. No changes made."
+    Info "VS Code remote HPC configuration already exists. No changes made."
 }
 
 # If it does not exist already, create a new ssh key for vscode-remote-hpc
 if (-not (Test-Path -Path $sshkey)) {
    if ($PSBoundParameters.Count -eq 0) {
-      $ans = Read-Host "About to create and upload an ssh key to $headnode. You will be prompted for your cluster password. Press any key to continue "
+      Info "About to create and upload an ssh key to $headnode"
+      Info "You will be prompted for your cluster password"
+      $ans = Read-Host "Press any key to continue "
    }
    ssh-keygen -q -f $sshkey -t ed25519 -C "vscode-remote-hpc@${env:COMPUTERNAME}" -N '""'
+   if (-not $?){
+      throw "ssh-keygen failed"
+   }
    if ($PSBoundParameters.Count -eq 0) {
       type "$sshkey.pub" | ssh $uname@$headnode "cat >> ~/.ssh/authorized_keys"
+      if (-not $?){
+         throw "ssh-key upload failed"
+      }
    }
 } else {
-    Write-Output "VS Code remote ssh key already exists. No changes made."
+    Info "VS Code remote ssh key already exists. No changes made."
 }
 
-Write-Output "-- All Done ---"
+Announce "All Done"
+
+} catch {
+      ErrorMsg "Setup encountered an error. Examine previous error messages for details"
+      Cleanup
+      return
+}
