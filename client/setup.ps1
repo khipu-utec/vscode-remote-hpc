@@ -155,7 +155,7 @@ if (-not (Test-Path -Path $sshkey)) {
    }
    if ($PSBoundParameters.Count -eq 0) {
       $cleankey = ([Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes("$sshkey.pub")) -replace '^\uFEFF', '' -replace '[\uFEFF\r\n]', '')
-      $cleankey | ssh $uname@$headnode "cat >> ~/.ssh/authorized_keys"
+      ssh $uname@$headnode "mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo '$cleankey' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
       if (-not $?){
          throw "ssh-key upload failed"
       }
