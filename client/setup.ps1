@@ -76,7 +76,11 @@ function HasBOM {
         [string]$filename
     )
     $file=Get-Item $filename
-    [byte[]]$bytes = Get-Content -Encoding Byte -ReadCount 3 -TotalCount 3 -Path $file.FullName
+    if ($PSVersionTable.PSVersion.Major -ge 6) {
+        [byte[]]$bytes = Get-Content -AsByteStream -ReadCount 3 -TotalCount 3 -Path $file.FullName
+    } else {
+        [byte[]]$bytes = Get-Content -Encoding Byte -ReadCount 3 -TotalCount 3 -Path $file.FullName
+    }
     if( $bytes[0] -eq 0xef -and $bytes[1] -eq 0xbb -and $bytes[2] -eq 0xbf )
     {
         return $true
