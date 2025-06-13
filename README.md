@@ -10,7 +10,7 @@ SPDX-License-Identifier: CC-BY-NC-SA-1.0
 Scripts for connecting [VS Code](https://code.visualstudio.com/download) to a non-interactive Khipu compute 
 node managed by [SLURM](https://slurm.schedmd.com/overview.html) workload manager. 
 
-This repo has been forked from [vscode-remote-hpc](https://github.com/esi-neuroscience/vscode-remote-hpc)
+This repo has been forked from [esi-neuroscience/vscode-remote-hpc](https://github.com/esi-neuroscience/vscode-remote-hpc)
 and was slightly modified to work with Khipu HPC cluster. It supports macOS, Linux and Windows (PowerShell) 
 and does not need special privileges. 
 
@@ -41,13 +41,13 @@ Open a terminal (`Terminal.App` in macOS) and run the following command:
 curl -fsSL https://raw.githubusercontent.com/khipu-utec/vscode-remote-hpc/refs/heads/main/client/setup.sh | bash
 ```
 
+![](https://github.com/khipu-utec/vscode-remote-hpc/blob/main/doc/media/vscode_remote_khipu_demo.gif)
+
 ## Usage
 
-![](https://github.com/esi-neuroscience/vscode-remote-hpc/blob/main/doc/media/vscode_remote_hpc_demo.gif)
-
-The `vscode-remote-hpc` host is now available in the VS Code Remote Explorer. 
-Connecting to this host will automatically launch a sbatch job on a HPC compute node, 
-wait for it to start, and connect to the node as soon as the job is running.
+The `vscode-remote-khipu` host is now available in the VS Code Remote Explorer. 
+Connecting to this host will automatically launch a sbatch job to the data-science 
+partition, wait for it to start, and connect to the node as soon as the job is running.
 Thus, controlling VS Code remote HPC sessions can be done exclusively from 
 within VS Code itself. 
 
@@ -58,7 +58,7 @@ the same SLURM job.
 Note that disconnecting the remote session in VS Code will **not** kill the 
 corresponding SLURM job. If you close the remote window the SLURM job keeps running. 
 Jobs are automatically killed by the SLURM controller when they reach their 
-runtime limit. You can manually kill the job by logging on to the cluster head node 
+runtime limit (4 hours). You can manually kill the job by logging on to the cluster head node 
 and running the command 
 
 ``` bash
@@ -73,9 +73,9 @@ to list or cancel running jobs. You can invoke `vscode-remote help` for more inf
 
 ## Removal
 
-To remove `vscode-remote-hpc` either manually delete the "vscode-remote-hpc" 
+To remove `vscode-remote-khipu` either manually delete the "vscode-remote-khipu" 
 config block from your ssh configuration file and remove the generated ssh 
-key-pair (`vscode-remote-hpc` + `vscode-remote-hpc.pub`) or run the respective 
+key-pair (`vscode-remote-khipu` + `vscode-remote-khipu.pub`) or run the respective 
 setup command again:
 
 ### Windows 10 and 11 (PowerShell) 
