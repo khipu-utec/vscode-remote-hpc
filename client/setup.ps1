@@ -1,6 +1,7 @@
 #
 # Windows PowerShell client installation script
-#
+
+# Copyright © 2025 Khipu HPC
 # Copyright © 2025 Ernst Strüngmann Institute (ESI) for Neuroscience
 # in Cooperation with Max Planck Society
 #
@@ -11,18 +12,17 @@
 # (mainly intended for testing!)
 param(
     [Parameter(Position=0, Mandatory=$false)]
-    [string]$uname,
-    [Parameter(Position=1, Mandatory=$false)]
-    [string]$headnode
+    [string]$uname
 )
 
 # Default ssh config/key location
 $sshdirname = ".ssh"
-$sshkeyname = "vscode-remote-hpc"
+$sshkeyname = "vscode-remote-khipu"
 $sshdir = "$HOME\$sshdirname"
 $sshconfig = "$sshdir\config"
 $sshconfigbak = "${sshconfig}_$(get-date -f yyyy-MM-dd).vsr"
 $sshkey = "$sshdir\$sshkeyname"
+$headnode = "khipu.utec.edu.pe"
 
 # Helpers to prettify output
 function ErrorMsg($msg) { Write-Host "FAILED: $msg" -ForegroundColor Red }
@@ -39,7 +39,7 @@ function Cleanup {
         $skipBlock = $false
         foreach ($line in $lines) {
             # Detect start of block
-            if ($line -match '^\s*Host\s+vscode-remote-hpc\s*$') {
+            if ($line -match '^\s*Host\s+vscode-remote-khipu\s*$') {
                 $skipBlock = $true
                 continue
             }
@@ -59,7 +59,7 @@ function Cleanup {
             }
         }
         $newLines | Set-Content $sshconfig
-        Info "Block for vscode-remote-hpc has been removed from $sshconfig (if it was present)."
+        Info "Block for vscode-remote-khipu has been removed from $sshconfig (if it was present)."
     } else {
         Info "$sshconfig does not exist. Nothing to remove."
     }
@@ -109,12 +109,12 @@ function SanitizeKeys {
 # ----------------------------------------------------------------------
 try {
 
-Announce "This script sets up VS Code remote connections to the HPC cluster"
+Announce "This script sets up VS Code remote connections to Khipu HPC cluster"
 
-# Check if vscode-remote-hpc has already been setup
+# Check if vscode-remote-khipu has already been setup
 if ((Test-Path $sshconfig) -and (Test-Path $sshkey)) {
     if ($PSBoundParameters.Count -eq 0) {
-        Info "It seems vscode-remote-hpc is already installed. How do you want to proceed?"
+        Info "It seems vscode-remote-khipu is already installed. How do you want to proceed?"
         Info "1. Abort"
         Info "2. Uninstall"
         $choice = Read-Host "Please choose an option (1 or 2)"
@@ -127,7 +127,7 @@ if ((Test-Path $sshconfig) -and (Test-Path $sshkey)) {
             }
         '2' {
             Cleanup
-            Announce "All cleaned up, vscode-remote-hpc has been uninstalled. Bye."
+            Announce "All cleaned up, vscode-remote-khipu has been uninstalled. Bye."
             return
         }
         Default {
@@ -139,17 +139,13 @@ if ((Test-Path $sshconfig) -and (Test-Path $sshkey)) {
 
 # Query account/head node information
 if (-not $uname) {
-    Info "Please enter your HPC username:"
+    Info "Please enter your Khipu username:"
     $uname = Read-Host
-}
-if (-not $headnode) {
-    Info "Please enter the IP address or hostname of the cluster head node"
-    $headnode = Read-Host "(hub.esi.local at ESI, or 192.168.161.221 at CoBIC): "
 }
 
 # Put together configuration block for ssh config
 $configblock = @"
-Host vscode-remote-hpc
+Host vscode-remote-khipu
     User $uname
     IdentityFile ~/$sshdirname/$sshkeyname
     ProxyCommand ssh $uname@$headnode ""/usr/local/bin/vscode-remote connect""
@@ -169,7 +165,7 @@ if (-not (Test-Path -Path $sshconfig)) {
 }
 
 # Check for existing Host block
-$configText = Select-String -Path $sshconfig -Pattern "Host vscode-remote-hpc"
+$configText = Select-String -Path $sshconfig -Pattern "Host vscode-remote-khipu"
 if ($configText -eq $null){
     Add-Content -Path $sshconfig -Value "`n$configblock"
     Info "Updated ssh configuration"
@@ -177,14 +173,14 @@ if ($configText -eq $null){
     Info "VS Code remote HPC configuration already exists. No changes made."
 }
 
-# If it does not exist already, create a new ssh key for vscode-remote-hpc
+# If it does not exist already, create a new ssh key for vscode-remote-khipu
 if (-not (Test-Path -Path $sshkey)) {
    if ($PSBoundParameters.Count -eq 0) {
       Info "About to create and upload an ssh key to $headnode"
-      Info "You will be prompted for your cluster password"
+      Info "You will be prompted for your Khipu password"
       $ans = Read-Host "Press any key to continue "
    }
-   ssh-keygen -q -f $sshkey -t ed25519 -C "vscode-remote-hpc@${env:COMPUTERNAME}" -N '""'
+   ssh-keygen -q -f $sshkey -t ed25519 -C "vscode-remote-khipu@${env:COMPUTERNAME}" -N '""'
    if (-not $?){
       throw "ssh-keygen failed"
    }

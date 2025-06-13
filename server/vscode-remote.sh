@@ -2,6 +2,7 @@
 #
 # Script for connecting to SLURMed VS Code Remote sessions
 #
+# Copyright © 2025 Khipu HPC
 # Copyright © 2025 Ernst Strüngmann Institute (ESI) for Neuroscience
 # in Cooperation with Max Planck Society
 # Copyright © 2025  Gert Mertes
@@ -10,14 +11,7 @@
 #
 
 TIMEOUT=300
-if [[ "${HOSTNAME}" == "esi-sv"* ]]; then
-    SBATCH_PARAM="-p 8GBL -c 1 --mem-per-cpu 7500MB"
-elif [[ "${HOSTNAME}" == "bic-sv"* ]]; then
-    SBATCH_PARAM="-p 8GBSx86 -c 1 --mem-per-cpu 7500MB"
-else
-    echo "WARNING: Unknown HPC environment ${HOSTNAME} - falling back to SLURM defaults"
-    SBATCH_PARAM="-q ni -t 12:00:00 --mem=32G -c 8"
-fi
+SBATCH_PARAM="-p data-science --gres=shard:4 -t 04:00:00 --mem=32G -c 8"
 
 function usage ()
 {

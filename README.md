@@ -1,22 +1,18 @@
 <!--
+Copyright (c) 2025 Khipu HPC
 Copyright (c) 2025 Ernst Strüngmann Institute (ESI) for Neuroscience
 in Cooperation with Max Planck Society
 SPDX-License-Identifier: CC-BY-NC-SA-1.0
 -->
 
-[![Test Setup](https://github.com/esi-neuroscience/vscode-remote-hpc/actions/workflows/test-setup.yml/badge.svg)](https://github.com/esi-neuroscience/vscode-remote-hpc/actions/workflows/test-setup.yml)
-[![REUSE status](https://api.reuse.software/badge/github.com/esi-neuroscience/vscode-remote-hpc)](https://api.reuse.software/info/github.com/esi-neuroscience/vscode-remote-hpc)
+# VS Code Remote for Khipu HPC
 
-# VS Code Remote HPC
+Scripts for connecting [VS Code](https://code.visualstudio.com/download) to a non-interactive Khipu compute 
+node managed by [SLURM](https://slurm.schedmd.com/overview.html) workload manager. 
 
-Scripts for connecting [VS Code](https://code.visualstudio.com/download) to a 
-non-interactive HPC compute node managed by the [SLURM](https://slurm.schedmd.com/overview.html)
-workload manager. 
-
-This repo has been forked from [vscode-remote-hpc](https://github.com/gmertes/vscode-remote-hpc)
-and (in parts) heavily modified: the server-side installation requires administrative 
-access to the cluster head node(s), the client side installation supports macOS, 
-Linux and Windows (PowerShell) and does not need special privileges. 
+This repo has been forked from [vscode-remote-hpc](https://github.com/esi-neuroscience/vscode-remote-hpc)
+and was slightly modified to work with Khipu HPC cluster. It supports macOS, Linux and Windows (PowerShell) 
+and does not need special privileges. 
 
 ## Features
 
@@ -34,7 +30,7 @@ extension for Visual Studio Code.
 Open PowerShell and run the following command 
 
 ``` PowerShell
-irm https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/heads/main/client/setup.ps1 | iex
+irm https://raw.githubusercontent.com/khipu-utec/vscode-remote-hpc/refs/heads/main/client/setup.ps1 | iex
 ```
 
 ### Linux, macOS and Windows Subsystem for Linux (WSL)
@@ -42,7 +38,7 @@ irm https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/he
 Open a terminal (`Terminal.App` in macOS) and run the following command:
 
 ```zsh
-curl -fsSL https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/heads/main/client/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/khipu-utec/vscode-remote-hpc/refs/heads/main/client/setup.sh | bash
 ```
 
 ## Usage
@@ -85,35 +81,13 @@ setup command again:
 ### Windows 10 and 11 (PowerShell) 
 
 ``` PowerShell
-irm https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/heads/main/client/setup.ps1 | iex
+irm https://raw.githubusercontent.com/khipu-utec/vscode-remote-hpc/refs/heads/main/client/setup.ps1 | iex
 ```
 
 ### Linux, macOS and Windows Subsystem for Linux (WSL)
 
 ```zsh
-curl -fsSL https://raw.githubusercontent.com/esi-neuroscience/vscode-remote-hpc/refs/heads/main/client/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/khipu-utec/vscode-remote-hpc/refs/heads/main/client/setup.sh | bash
 ```
 
-## HPC Admin Setup
 
-The following applications must be executable for non-privileged users on on all 
-compute nodes:
-
-- `sshd` installed in `/usr/sbin` or available in the `$PATH`
-- `nc` (netcat) must be available on the login node(s)
-- compute node names must resolve to their internal IP addresses
-- compute nodes must be accessible via IP from the login node
-
-The client-side setup expects `vscode-remote` as well as `vscode-remote-job.sh`
-to reside in `/usr/local/bin`. The recommended manner to set it up that way is 
-to clone this repository and use symlinks (so that future updates can be deployed
-using a simple `git pull`):
-
-``` bash
-cd /path/to/cluter-fs/
-git clone https://github.com/pantaray/vscode-remote-hpc.git
-ln -s /path/to/cluter-fs/vscode-remote-hpc/server/vscode-remote.sh /usr/local/bin/vscode-remote
-ln -s /path/to/cluter-fs/vscode-remote-hpc/server/vscode-remote-job.sh /usr/local/bin/vscode-remote-job.sh
-```
-
-Ensure that both scripts can be executed by non-privileged users. 
