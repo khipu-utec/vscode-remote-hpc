@@ -29,7 +29,7 @@ fi
 sshdir="${HOME}/.ssh"
 sshconfig="${sshdir}/config"
 sshconfigbak="${sshconfig}_$(date +%Y-%m-%d).vsr"
-sshkey="${sshdir}/vscode-remote-hpc"
+sshkey="${sshdir}/vscode-remote-khipu"
 headnode="khipu.utec.edu.pe"
 
 # Either query for HPC username and headnode or take CLI arguments
@@ -101,13 +101,13 @@ cleanup(){
         info "Wrote backup-copy ${sshconfigbak} of current ssh configuration file"
         awk '
            BEGIN {skip=0}
-           /^[ \t]*Host[ \t]+vscode-remote-hpc[ \t]*$/ {skip=1; next}
+           /^[ \t]*Host[ \t]+vscode-remote-khipu[ \t]*$/ {skip=1; next}
            skip && /^[ \t]/ {next}
            skip && /^[[:space:]]*$/ {next}
            skip {skip=0}
            {print}
         ' "${sshconfig}" > "${sshconfig}.tmp" && mv "${sshconfig}.tmp" "${sshconfig}"
-        info "Block for vscode-remote-hpc has been removed from ${sshconfig} (if it was present)."
+        info "Block for vscode-remote-khipu has been removed from ${sshconfig} (if it was present)."
     else
         info "${sshconfig} does not exist. Nothing to remove."
     fi
@@ -122,10 +122,10 @@ cleanup(){
 # ----------------------------------------------------------------------
 announce "This script sets up VS Code remote connections to Khipu HPC cluster"
 
-# Check if vscode-remote-hpc has already been setup
+# Check if vscode-remote-khipu has already been setup
 if [[ -f "${sshconfig}" && -f "${sshkey}" ]]; then
     if [[ $# -eq 0 ]]; then
-        info "It seems vscode-remote-hpc is already installed. How do you want to proceed?"
+        info "It seems vscode-remote-khipu is already installed. How do you want to proceed?"
         info "1. Abort"
         info "2. Uninstall"
         read -p "Please choose an option (1 or 2): " choice </dev/tty
@@ -138,7 +138,7 @@ if [[ -f "${sshconfig}" && -f "${sshkey}" ]]; then
             ;;
         2)
             cleanup
-            announce "All cleaned up, vscode-remote-hpc has been uninstalled."
+            announce "All cleaned up, vscode-remote-khipu has been uninstalled."
             exit
             ;;
         *)
@@ -156,7 +156,7 @@ fi
 
 
 # Put together configuration block for ssh config
-configblock="Host vscode-remote-hpc
+configblock="Host vscode-remote-khipu
     User ${uname}
     IdentityFile ${sshkey}
     ProxyCommand ssh ${uname}@${headnode} \"/usr/local/bin/vscode-remote connect\"
@@ -178,7 +178,7 @@ else
 fi
 
 # Check for existing Host block
-if ! grep -qE '^[Hh]ost[[:space:]]+vscode-remote-hpc\b' "${sshconfig}"; then
+if ! grep -qE '^[Hh]ost[[:space:]]+vscode-remote-khipu\b' "${sshconfig}"; then
     echo "" >> "${sshconfig}"
     echo "${configblock}" >> "${sshconfig}"
     info "Updated ssh configuration"
@@ -186,7 +186,7 @@ else
     info "VS Code remote HPC configuration already exists. No changes made."
 fi
 
-# If it does not exist already, create a new ssh key for vscode-remote-hpc
+# If it does not exist already, create a new ssh key for vscode-remote-khipu
 if [ ! -f "${sshkey}" ]; then
     if [[ $# -eq 0 ]]; then
         info "About to create and upload an ssh key to ${headnode}"
@@ -197,7 +197,7 @@ if [ ! -f "${sshkey}" ]; then
     if [ -z "${machine}" ]; then
         machine="${HOSTNAME}"
     fi
-    ssh-keygen -q -f "${sshkey}" -t ed25519 -C "vscode-remote-hpc@${machine}" -N ""
+    ssh-keygen -q -f "${sshkey}" -t ed25519 -C "vscode-remote-khipu@${machine}" -N ""
     if [[ $# -eq 0 ]]; then
         ssh-copy-id -i "${sshkey}" "${uname}@${headnode}"
     fi

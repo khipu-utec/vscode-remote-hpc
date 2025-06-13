@@ -84,12 +84,12 @@ VSRhead="hpc-head.domain.local"
 sshdir="${HOME}/.ssh"
 sshconfig="${sshdir}/config"
 sshconfigbak="${sshconfig}_$(date +%Y-%m-%d).vsr"
-sshkey="${sshdir}/vscode-remote-hpc"
+sshkey="${sshdir}/vscode-remote-khipu"
 dummykey="${sshdir}/dummy"
 
-# Prepare what the expected Host block added by vscode-remote-hpc should look like
+# Prepare what the expected Host block added by vscode-remote-khipu should look like
 read -r -d '' expectedconfig <<EOF
-Host vscode-remote-hpc
+Host vscode-remote-khipu
     User ${VSRtester}
     IdentityFile ${sshkey}
     ProxyCommand ssh ${VSRtester}@${VSRhead} "/usr/local/bin/vscode-remote connect"
@@ -103,7 +103,7 @@ if [ -f "${sshkey}" ] || [ -f "${sshkey}.pub" ] || [ -f "${sshconfig}" ]; then
 fi
 
 # Run the setup w/input args to suppress interactive prompts
-info "Installing vscode-remote-hpc"
+info "Installing vscode-remote-khipu"
 "${VSRsetup}" "${VSRtester}" "${VSRhead}"
 
 # Ensure ssh config has been created
@@ -127,7 +127,7 @@ get_host_block() {
   ' "$2" | sed '/^[[:space:]]*$/d'
 }
 # Compare actual config to expected
-actualconfig=$(get_host_block "vscode-remote-hpc" "${sshconfig}")
+actualconfig=$(get_host_block "vscode-remote-khipu" "${sshconfig}")
 if [ "${actualconfig}" == "${expectedconfig}" ]; then
     passed "Host block written correctly to ${sshconfig}"
 else
@@ -147,8 +147,8 @@ else
     exit 1
 fi
 
-# Uninstall vscode-remote-hpc
-info "Uninstalling vscode-remote-hpc"
+# Uninstall vscode-remote-khipu
+info "Uninstalling vscode-remote-khipu"
 "${VSRsetup}" "${VSRtester}" "${VSRhead}"
 
 # Ensure ssh config file is still present
@@ -168,7 +168,7 @@ else
 fi
 
 # Ensure Host block has been wiped
-actualconfig=$(get_host_block "vscode-remote-hpc" "${sshconfig}")
+actualconfig=$(get_host_block "vscode-remote-khipu" "${sshconfig}")
 if [ -z "$actualconfig" ]; then
     passed "Host block removed from config file ${sshconfig}"
 else
@@ -198,7 +198,7 @@ echo "${dummyblock}" >> "${sshconfig}"
 dummy_trim="$(echo "${dummyblock}" | sed 's/^[ \t]*//;s/[ \t]*$//')"
 
 # Re-run the setup and ensure existing config + keys stay intact
-info "Re-install vscode-remote-hpc with existing ssh config + keys"
+info "Re-install vscode-remote-khipu with existing ssh config + keys"
 "${VSRsetup}" "${VSRtester}" "${VSRhead}"
 
 # Ensure backup copy of ssh configuration has been created
@@ -223,8 +223,8 @@ else
     exit 1
 fi
 
-# Ensure vscode-remote-hpc host block is present
-actualconfig=$(get_host_block "vscode-remote-hpc" "${sshconfig}")
+# Ensure vscode-remote-khipu host block is present
+actualconfig=$(get_host_block "vscode-remote-khipu" "${sshconfig}")
 if [ "${actualconfig}" == "${expectedconfig}" ]; then
     passed "Host block written correctly to ${sshconfig}"
 else
@@ -250,7 +250,7 @@ else
     exit 1
 fi
 
-# Ensure vscode-remote-hpc ssh keys have been generated
+# Ensure vscode-remote-khipu ssh keys have been generated
 if [ -f "${sshkey}" ] && [ -f "${sshkey}.pub" ]; then
     passed "ssh keys successfully generated"
 else
@@ -266,8 +266,8 @@ else
     exit 1
 fi
 
-# Uninstall vscode-remote-hpc again and ensure existing config is preserved
-info "Uninstalling vscode-remote-hpc preserving original ssh config + keys"
+# Uninstall vscode-remote-khipu again and ensure existing config is preserved
+info "Uninstalling vscode-remote-khipu preserving original ssh config + keys"
 "${VSRsetup}" "${VSRtester}" "${VSRhead}"
 
 # Ensure ssh config file is still present
@@ -278,7 +278,7 @@ else
 fi
 
 # Ensure block has been wiped, but previous ssh configuration has not been removed
-actualconfig=$(get_host_block "vscode-remote-hpc" "${sshconfig}")
+actualconfig=$(get_host_block "vscode-remote-khipu" "${sshconfig}")
 if [ -z "${actualconfig}" ]; then
     passed "Host block removed from config file ${sshconfig}"
 else

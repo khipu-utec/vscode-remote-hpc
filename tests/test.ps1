@@ -20,14 +20,14 @@ $VSRhead = "hpc-head.domain.local"
 $sshdir = "$HOME\.ssh"
 $sshconfig = "$sshdir\config"
 $sshconfigbak = "${sshconfig}_$(get-date -f yyyy-MM-dd).vsr"
-$sshkey = "$sshdir\vscode-remote-hpc"
+$sshkey = "$sshdir\vscode-remote-khipu"
 $dummykey = "$sshdir\dummy"
 
-# Prepare what the expected Host block added by vscode-remote-hpc should look like
+# Prepare what the expected Host block added by vscode-remote-khipu should look like
 $expectedconfig = @"
-Host vscode-remote-hpc
+Host vscode-remote-khipu
     User $VSRtester
-    IdentityFile ~/.ssh/vscode-remote-hpc
+    IdentityFile ~/.ssh/vscode-remote-khipu
     ProxyCommand ssh $VSRtester@$VSRhead ""/usr/local/bin/vscode-remote connect""
     StrictHostKeyChecking no
 "@.Trim()
@@ -39,7 +39,7 @@ if ((Test-Path -Path $sshkey) -or (Test-Path -Path "$sshkey.pub") -or (Test-Path
 }
 
 # Run the setup w/input args to suppress interactive prompts
-Write-Host "Installing vscode-remote-hpc" -ForegroundColor Yellow
+Write-Host "Installing vscode-remote-khipu" -ForegroundColor Yellow
 & $VSRsetup $VSRtester $VSRhead
 
 # First and foremost: ensure ssh config has been created
@@ -50,9 +50,9 @@ if (Test-Path -Path $sshconfig) {
     exit 1
 }
 
-# Read the actual ssh config file and regex to extract ssh configuration added by vscode-remote-hpc
+# Read the actual ssh config file and regex to extract ssh configuration added by vscode-remote-khipu
 $configblock = Get-Content $sshconfig -Raw
-$match = [regex]::Match($configblock, "(^Host\s+vscode-remote-hpc.*?)(?:(?:^Host|\z))", [System.Text.RegularExpressions.RegexOptions]::Multiline -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
+$match = [regex]::Match($configblock, "(^Host\s+vscode-remote-khipu.*?)(?:(?:^Host|\z))", [System.Text.RegularExpressions.RegexOptions]::Multiline -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
 if ($match.Success) {
     $actualconfig = $match.Groups[1].Value.Trim()
     if ($actualconfig -eq $expectedconfig) {
@@ -78,8 +78,8 @@ if ((Test-Path -Path $sshkey) -and (Test-Path -Path "$sshkey.pub")) {
     exit 1
 }
 
-# Uninstall vscode-remote-hpc
-Write-Host "Uninstalling vscode-remote-hpc" -ForegroundColor Yellow
+# Uninstall vscode-remote-khipu
+Write-Host "Uninstalling vscode-remote-khipu" -ForegroundColor Yellow
 & $VSRsetup $VSRtester $VSRhead
 
 # Ensure ssh config file is still present
@@ -98,9 +98,9 @@ if (Test-Path -Path $sshconfigbak) {
     exit 1
 }
 
-# Ensure vscode-remote-hpc config block has been wiped
+# Ensure vscode-remote-khipu config block has been wiped
 $configblock = Get-Content $sshconfig -Raw
-$match = [regex]::Match($configblock, "(^Host\s+vscode-remote-hpc.*?)(?:(?:^Host|\z))", [System.Text.RegularExpressions.RegexOptions]::Multiline -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
+$match = [regex]::Match($configblock, "(^Host\s+vscode-remote-khipu.*?)(?:(?:^Host|\z))", [System.Text.RegularExpressions.RegexOptions]::Multiline -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
 if (-not $match.Success) {
     Write-Host "Test passed: Host block removed from config file." -ForegroundColor Green
 } else {
@@ -126,7 +126,7 @@ Host VeryImportant
 Add-Content -Path $sshconfig -Value "`n$dummyblock"
 
 # Re-run the setup and ensure existing config + keys stay intact
-Write-Host "Re-install vscode-remote-hpc with existing ssh config + keys" -ForegroundColor Yellow
+Write-Host "Re-install vscode-remote-khipu with existing ssh config + keys" -ForegroundColor Yellow
 & $VSRsetup $VSRtester $VSRhead
 
 # Ensure backup copy of ssh configuration has been created
@@ -157,10 +157,10 @@ if ($match.Success) {
     exit 1
 }
 
-# Read the actual ssh config file and regex to extract ssh configuration added by vscode-remote-hpc
+# Read the actual ssh config file and regex to extract ssh configuration added by vscode-remote-khipu
 # Additionally, ensure existing config is still in place
 $configblock = Get-Content $sshconfig -Raw
-$match = [regex]::Match($configblock, "(^Host\s+vscode-remote-hpc.*?)(?:(?:^Host|\z))", [System.Text.RegularExpressions.RegexOptions]::Multiline -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
+$match = [regex]::Match($configblock, "(^Host\s+vscode-remote-khipu.*?)(?:(?:^Host|\z))", [System.Text.RegularExpressions.RegexOptions]::Multiline -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
 if ($match.Success) {
     $actualconfig = $match.Groups[1].Value.Trim()
     if ($actualconfig -eq $expectedconfig) {
@@ -195,7 +195,7 @@ if ($match.Success) {
     exit 1
 }
 
-# Ensure vscode-remote-hpc ssh keys have been generated
+# Ensure vscode-remote-khipu ssh keys have been generated
 if ((Test-Path -Path $sshkey) -and (Test-Path -Path "$sshkey.pub")) {
     Write-Host "Test passed: ssh keys generated." -ForegroundColor Green
 } else {
@@ -211,8 +211,8 @@ if ((Test-Path -Path $dummykey) -and (Test-Path -Path "$dummykey.pub")) {
     exit 1
 }
 
-# Uninstall vscode-remote-hpc again and ensure existing config is preserved
-Write-Host "Uninstalling vscode-remote-hpc preserving original ssh config + keys" -ForegroundColor Yellow
+# Uninstall vscode-remote-khipu again and ensure existing config is preserved
+Write-Host "Uninstalling vscode-remote-khipu preserving original ssh config + keys" -ForegroundColor Yellow
 & $VSRsetup $VSRtester $VSRhead
 
 # Ensure ssh config file is still present
@@ -223,10 +223,10 @@ if (Test-Path -Path $sshconfig) {
     exit 1
 }
 
-# Ensure vscode-remote-hpc config block has been wiped from config file but
+# Ensure vscode-remote-khipu config block has been wiped from config file but
 # previous ssh configuration has not been removed
 $configblock = Get-Content $sshconfig -Raw
-$match = [regex]::Match($configblock, "(^Host\s+vscode-remote-hpc.*?)(?:(?:^Host|\z))", [System.Text.RegularExpressions.RegexOptions]::Multiline -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
+$match = [regex]::Match($configblock, "(^Host\s+vscode-remote-khipu.*?)(?:(?:^Host|\z))", [System.Text.RegularExpressions.RegexOptions]::Multiline -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
 if (-not $match.Success) {
     Write-Host "Test passed: Host block removed from config file." -ForegroundColor Green
 } else {
