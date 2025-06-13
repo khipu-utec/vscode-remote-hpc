@@ -33,6 +33,8 @@ Open PowerShell and run the following command
 irm https://raw.githubusercontent.com/khipu-utec/vscode-remote-hpc/refs/heads/main/client/setup.ps1 | iex
 ```
 
+![](https://github.com/khipu-utec/vscode-remote-hpc/blob/main/doc/media/vscode_remote_khipu_demo_win.gif)
+
 ### Linux, macOS and Windows Subsystem for Linux (WSL)
 
 Open a terminal (`Terminal.App` in macOS) and run the following command:
@@ -41,7 +43,7 @@ Open a terminal (`Terminal.App` in macOS) and run the following command:
 curl -fsSL https://raw.githubusercontent.com/khipu-utec/vscode-remote-hpc/refs/heads/main/client/setup.sh | bash
 ```
 
-![](https://github.com/khipu-utec/vscode-remote-hpc/blob/main/doc/media/vscode_remote_khipu_demo.gif)
+![](https://github.com/khipu-utec/vscode-remote-hpc/blob/main/doc/media/vscode_remote_khipu_demo_linux.gif)
 
 ## Usage
 
