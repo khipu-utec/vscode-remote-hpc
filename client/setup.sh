@@ -2,6 +2,7 @@
 #
 # Linux/macOS client installation script
 #
+# Copyright © 2025 Khipu HPC
 # Copyright © 2025 Ernst Strüngmann Institute (ESI) for Neuroscience
 # in Cooperation with Max Planck Society
 #
@@ -29,14 +30,12 @@ sshdir="${HOME}/.ssh"
 sshconfig="${sshdir}/config"
 sshconfigbak="${sshconfig}_$(date +%Y-%m-%d).vsr"
 sshkey="${sshdir}/vscode-remote-hpc"
+headnode="khipu.utec.edu.pe"
 
 # Either query for HPC username and headnode or take CLI arguments
 # (mainly intended for testing!)
 if [ -n "$1" ]; then
     uname="$1"
-fi
-if [ -n "$2" ]; then
-    headnode="$2"
 fi
 
 # String formatters to prettify output
@@ -121,7 +120,7 @@ cleanup(){
 # ----------------------------------------------------------------------
 #                    START OF INSTALLATION SCRIPT
 # ----------------------------------------------------------------------
-announce "This script sets up VS Code remote connections to the HPC cluster"
+announce "This script sets up VS Code remote connections to Khipu HPC cluster"
 
 # Check if vscode-remote-hpc has already been setup
 if [[ -f "${sshconfig}" && -f "${sshkey}" ]]; then
@@ -151,13 +150,10 @@ fi
 
 # Query account/head node information
 if [[ -z "${uname+x}" ]]; then
-    info "Please enter your HPC username:"
+    info "Please enter your Khipu username:"
     read -p "" uname </dev/tty
 fi
-if [[ -z "${headnode+x}" ]]; then
-    info "Please enter the IP address or hostname of the cluster head node"
-    read -p "(hub.esi.local at ESI, or 192.168.161.221 at CoBIC): " headnode </dev/tty
-fi
+
 
 # Put together configuration block for ssh config
 configblock="Host vscode-remote-hpc
@@ -194,7 +190,7 @@ fi
 if [ ! -f "${sshkey}" ]; then
     if [[ $# -eq 0 ]]; then
         info "About to create and upload an ssh key to ${headnode}"
-        info "You will be prompted for your cluster password"
+        info "You will be prompted for your Khipu password"
         read -p "Press any key to continue " ans </dev/tty
     fi
     machine="${HOST}"

@@ -1,6 +1,7 @@
 #
 # Windows PowerShell client installation script
-#
+
+# Copyright © 2025 Khipu HPC
 # Copyright © 2025 Ernst Strüngmann Institute (ESI) for Neuroscience
 # in Cooperation with Max Planck Society
 #
@@ -11,9 +12,7 @@
 # (mainly intended for testing!)
 param(
     [Parameter(Position=0, Mandatory=$false)]
-    [string]$uname,
-    [Parameter(Position=1, Mandatory=$false)]
-    [string]$headnode
+    [string]$uname
 )
 
 # Default ssh config/key location
@@ -23,6 +22,7 @@ $sshdir = "$HOME\$sshdirname"
 $sshconfig = "$sshdir\config"
 $sshconfigbak = "${sshconfig}_$(get-date -f yyyy-MM-dd).vsr"
 $sshkey = "$sshdir\$sshkeyname"
+$headnode = "khipu.utec.edu.pe"
 
 # Helpers to prettify output
 function ErrorMsg($msg) { Write-Host "FAILED: $msg" -ForegroundColor Red }
@@ -109,7 +109,7 @@ function SanitizeKeys {
 # ----------------------------------------------------------------------
 try {
 
-Announce "This script sets up VS Code remote connections to the HPC cluster"
+Announce "This script sets up VS Code remote connections to Khipu HPC cluster"
 
 # Check if vscode-remote-hpc has already been setup
 if ((Test-Path $sshconfig) -and (Test-Path $sshkey)) {
@@ -139,12 +139,8 @@ if ((Test-Path $sshconfig) -and (Test-Path $sshkey)) {
 
 # Query account/head node information
 if (-not $uname) {
-    Info "Please enter your HPC username:"
+    Info "Please enter your Khipu username:"
     $uname = Read-Host
-}
-if (-not $headnode) {
-    Info "Please enter the IP address or hostname of the cluster head node"
-    $headnode = Read-Host "(hub.esi.local at ESI, or 192.168.161.221 at CoBIC): "
 }
 
 # Put together configuration block for ssh config
@@ -181,7 +177,7 @@ if ($configText -eq $null){
 if (-not (Test-Path -Path $sshkey)) {
    if ($PSBoundParameters.Count -eq 0) {
       Info "About to create and upload an ssh key to $headnode"
-      Info "You will be prompted for your cluster password"
+      Info "You will be prompted for your Khipu password"
       $ans = Read-Host "Press any key to continue "
    }
    ssh-keygen -q -f $sshkey -t ed25519 -C "vscode-remote-hpc@${env:COMPUTERNAME}" -N '""'
